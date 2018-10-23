@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/andela/ah-backend-odin.svg?branch=161340167-Integrate-TravisCI-with-readme-badge)](https://travis-ci.org/andela/ah-backend-odin)
+
 Authors Haven - A Social platform for the creative at heart.
 =======
 
