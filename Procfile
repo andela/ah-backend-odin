@@ -1,1 +1,1 @@
-web: gunicorn ah-backend-odin.wsgi --log-file -
+web: gunicorn authors.wsgi --log-file -
