@@ -12,4 +12,4 @@ class TestAuthentication(TestCase):
 
     def test_create_users_returns_201_status_code(self):
         response = self.client.post("/api/users/", self.user)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
