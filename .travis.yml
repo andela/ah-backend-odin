@@ -14,7 +14,7 @@ before_script:
   - python manage.py migrate
   - psql -c 'create database authors;' -U postgres
 script:
-  - coverage run --source=authors manage.py test
+  - python manage.py test
 
 after_success:
   - coveralls
