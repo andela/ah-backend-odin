@@ -10,4 +10,4 @@ class TestLogin(TestCase):
     
     def test_login_user_returns_201_status_code(self):
         response = self.client.post("/api/users/login/", self.user)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
