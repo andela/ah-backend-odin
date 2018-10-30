@@ -1,0 +1,21 @@
+language: python
+python:
+  - "3.6"
+
+env:
+  - DJANGO_ENV=Testing
+
+services:
+  - postgresql
+
+before_script:
+  - pip install -r requirements.txt
+  - psql -c 'create database authors;' -U postgres
+  - python manage.py makemigrations
+  - python manage.py migrate
+  
+script:
+  - python manage.py test
+
+after_success:
+  - coveralls
