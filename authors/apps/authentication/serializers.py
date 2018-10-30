@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from .models import User
 
+import re
+
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new user."""
@@ -11,10 +13,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # Ensure passwords are at least 8 characters long, no longer than 128
     # characters, and can not be read by the client.
     password = serializers.CharField(
-        max_length=128,
-        min_length=8,
+        # max_length=128,
+        # min_length=8,
         write_only=True
     )
+    email = serializers.EmailField()
+    username = serializers.CharField()
 
     # The client should not be able to send a token along with a registration
     # request. Making `token` read-only handles that for us.
@@ -25,6 +29,44 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # or response, including fields specified explicitly above.
         fields = ['email', 'username', 'password']
 
+    def validate_email(self, value):
+        user_email_db = User.objects.filter(email=value)
+        if user_email_db.exists():
+            raise serializers.ValidationError("Email already in use")
+        elif re.match(r"([\w\.-]+)@([\w\.-]+)(\.[\w\.]+$)", value) is not None:
+            raise serializers.ValidationError(
+                "Enter valid Email ID forexample odin@gmail.com")
+        return value
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError(
+                "Weak password. Password should be atleast 8 characters long")
+        elif len(value) > 25:
+            raise serializers.ValidationError(
+                "Password can not be more than 25 caharacters")
+        elif not re.search(r'[0-9]', value):
+            raise serializers.ValidationError(
+                "Weak password. Include atleast one integer")
+        elif value.isupper() or value.islower():
+            raise serializers.ValidationError(
+                "Password contain both upper and lower cases")
+        elif value.isdigit():
+            raise serializers.ValidationError(
+                "Password can not coontain only integers")
+        return value
+
+    def validate_username(self, value):
+        username_db = User.objects.filter(username=value)
+        if username_db.exists():
+            raise serializers.ValidationError("Username already in use")
+        elif len(value) <= 2 or len(value) > 25:
+            raise serializers.ValidationError(
+                "Username should be between 2 to 25 characters long")
+        elif re.compile('[!@#$%^&*:;?><.0-9]').match(value):
+            raise serializers.ValidationError("Invalid characters not allowed")
+        return value
+
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**validated_data)
@@ -34,7 +76,6 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
-
 
     def validate(self, data):
         # The `validate` method is where we make sure that the current
@@ -94,7 +135,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     """Handles serialization and deserialization of User objects."""
 
-    # Passwords must be at least 8 characters, but no more than 128 
+    # Passwords must be at least 8 characters, but no more than 128
     # characters. These values are the default provided by Django. We could
     # change them, but that would create extra work while introducing no real
     # benefit, so let's just stick with the defaults.
@@ -112,10 +153,9 @@ class UserSerializer(serializers.ModelSerializer):
         # specifying the field with `read_only=True` like we did for password
         # above. The reason we want to use `read_only_fields` here is because
         # we don't need to specify anything else about the field. For the
-        # password field, we needed to specify the `min_length` and 
+        # password field, we needed to specify the `min_length` and
         # `max_length` properties too, but that isn't the case for the token
         # field.
-
 
     def update(self, instance, validated_data):
         """Performs an update on a User."""
