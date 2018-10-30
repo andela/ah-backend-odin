@@ -33,7 +33,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user_email_db = User.objects.filter(email=value)
         if user_email_db.exists():
             raise serializers.ValidationError("Email already in use")
-        elif re.match(r"([\w\.-]+)@([\w\.-]+)(\.[\w\.]+$)", value) is not None:
+        elif not re.match(r"([\w\.-]+)@([\w\.-]+)(\.[\w\.]+$)", value):
             raise serializers.ValidationError(
                 "Enter valid Email ID forexample odin@gmail.com")
         return value
