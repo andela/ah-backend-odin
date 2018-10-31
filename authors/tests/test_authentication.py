@@ -77,9 +77,3 @@ class TestAuthentication(TestCase):
         response=self.client.post("/api/users/",{"user":{"username":"su"}} )
         self.assertEqual(response.json()['errors']['username'], [
                          u'Username should be between 3 to 25 characters long'])
-    
-
-
-   
-    
-
