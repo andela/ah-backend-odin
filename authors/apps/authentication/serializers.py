@@ -50,10 +50,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 "Weak password. Include atleast one integer")
         elif value.isupper() or value.islower():
             raise serializers.ValidationError(
-                "Password contain both upper and lower cases")
+                "Password should contain both upper and lower cases")
         elif value.isdigit():
             raise serializers.ValidationError(
-                "Password can not coontain only integers")
+                "Password can not contain only integers")
         return value
 
     def validate_username(self, value):
@@ -62,7 +62,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Username already in use")
         elif len(value) <= 2 or len(value) > 25:
             raise serializers.ValidationError(
-                "Username should be between 2 to 25 characters long")
+                "Username should be between 3 to 25 characters long")
         elif re.compile('[!@#$%^&*:;?><.0-9]').match(value):
             raise serializers.ValidationError("Invalid characters not allowed")
         return value
