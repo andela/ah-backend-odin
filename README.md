@@ -1,5 +1,8 @@
+[![Build Status](https://travis-ci.org/andela/ah-backend-odin.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-odin)
+
 Authors Haven - A Social platform for the creative at heart.
 =======
+[![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-odin/badge.svg)](https://coveralls.io/github/andela/ah-backend-odin)
 
 ## Vision
 Create a community of like minded authors to foster inspiration and innovation
