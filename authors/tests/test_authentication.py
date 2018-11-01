@@ -16,6 +16,7 @@ class TestAuthentication(TestCase):
     def create_user(self):
         return self.client.post("/api/users/", self.user_data)
 
+      
     def login_user(self):
         self.create_user()
         return self.client.post("/api/users/login/", self.user_data)
@@ -30,7 +31,6 @@ class TestAuthentication(TestCase):
             response.data['username'],
             self.user_data["user"]["username"]
         )
-
     def test_successfull_user_registeration_response_has_token(self):
         response = self.create_user()
         self.assertIn('token', response.data)
@@ -42,3 +42,4 @@ class TestAuthentication(TestCase):
     def test_successfull_login_response_has_token(self):
         response = self.login_user()
         self.assertIn('token', response.data)
+
