@@ -39,10 +39,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'rest_framework',
-
+    
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
+    'authors.apps.PasswordResetToken',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +87,7 @@ WSGI_APPLICATION = 'authors.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DB_NAME', 'authors'),
+        'NAME': os.environ.get('DB_NAME', 'authors_haven'),
         'USER': os.environ.get('DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
@@ -176,3 +177,13 @@ REST_FRAMEWORK = {
     #     'authors.apps.authentication.backends.JWTAuthentication',
     # ),
 }
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'authorshaventia@gmail.com'
+EMAIL_HOST_PASSWORD = 'tia0987654321'
+EMAIL_PORT = 25
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'TeamOdin <noreply@example.com>'
+# SENDGRID_API_KEY='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'
+
+
