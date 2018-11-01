@@ -129,7 +129,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         minutes=settings.JWT['EXPIRATION_IN_MINUTES']
     )
     token = jwt.encode({
-        'id': self.username,
+        'username': self.username,
         'exp': int(date_time.strftime("%s"))
     }, settings.SECRET_KEY, algorithm=settings.JWT['ALGORITHM'])
     return token.decode('utf-8')
