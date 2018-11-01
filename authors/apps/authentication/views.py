@@ -4,6 +4,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
+from .models import User
+
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer
@@ -26,8 +33,28 @@ class RegistrationAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
+        #message_response = {'message':'Please confirm your email address to complete the registration', status=status.HTTP_200_OK}
+        
+        # return Response(message_response, status=status.HTTP_201_CREATED)
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+class ActivationAPIView(APIView):
+    permission_classes = (AllowAny,)
+    
+    def get(self, request, uidb64, token):
+        try:
+            email = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(email=email)
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            
+            return Response({'message':'Thank you for your email confirmation. Now you can login your account.'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message':'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)

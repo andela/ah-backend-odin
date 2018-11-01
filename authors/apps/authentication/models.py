@@ -8,6 +8,10 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.core.mail import send_mail
 class UserManager(BaseUserManager):
     """
     Django requires that custom users define their own Manager class. By
@@ -30,8 +34,21 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save()
 
-        return user
+        token = default_token_generator.make_token(user)
 
+        mail_subject = 'Activate your Authors Haven account.'
+        domain = settings.BASE_URL
+        uid = urlsafe_base64_encode(force_bytes(email))
+
+        template = '''Hi {},
+        Please click on the link to confirm your registration,
+        {}/api/users/verify/{}/{}'''.format(username, domain, uid.decode('utf-8'), token)
+
+
+        send_mail(mail_subject, template, 'authorshaventia@gmail.com', [email])
+
+        return user
+        
     def create_superuser(self, username, email, password):
       """
       Create and return a `User` with superuser powers.
@@ -68,7 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # will simply offer users a way to deactivate their account instead of
     # letting them delete it. That way they won't show up on the site anymore,
     # but we can still analyze the data.
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
 
     # The `is_staff` flag is expected by Django to determine who can and cannot
     # log into the Django admin site. For most users, this flag will always be
