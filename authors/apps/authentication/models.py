@@ -52,15 +52,7 @@ class UserManager(BaseUserManager):
         
     def create_superuser(self, username, email, password):
       """
-      Create and return a `User` with superuser powers.
-
-    return user
-
-  def create_superuser(self, username, email, password):
-    """
     Create and return a `User` with superuser powers.
-
-
     Superuser powers means that this use is an admin that can do anything
     they want.
     """
