@@ -172,7 +172,14 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
 
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'authors.apps.authentication.backends.JWTAuthentication',
-    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'authors.apps.authentication.backends.JWTAuthentication',
+    ),
+}
+
+JWT = {
+    # The algorithm to use for encoding and decoding jwt tokens
+    'ALGORITHM': 'HS256',
+    'EXPIRATION_IN_MINUTES': 60,
+    'TOKEN_PREFIX': 'bearer'
 }
