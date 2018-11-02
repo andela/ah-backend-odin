@@ -146,7 +146,9 @@ def reset_password(request):
 def change_passowrd(request): 
     if request.method == 'POST':
         data = {}
-        user = User.objects.get(email=request.POST['email'])
+        email = request.POST['email']
+        user = User.objects.get(email=email)
+        
         if user: 
             password = request.POST['password'].strip()
             if validate_password(password) == True:
@@ -155,7 +157,8 @@ def change_passowrd(request):
                 data['message'] = 'Password Successfully Updated!'
             else:
                 data['message'] = 'Password Does Not Meet All Requirements(Must Be At Least 8 Characters, Mixed Capital,Symbols and Lower Cases'
-
+        else:
+            data['message'] = f"User with email address {email} does not exist"
         return Response(data=data)
         
 def validate_password(password):
