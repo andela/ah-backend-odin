@@ -51,20 +51,27 @@ class UserManager(BaseUserManager):
         
     def create_superuser(self, username, email, password):
       """
-      Create and return a `User` with superuser powers.
+    Create and return a `User` with superuser powers.
+    Superuser powers means that this use is an admin that can do anything
+    they want.
+    """
+        if password is None:
+            raise TypeError('Superusers must have a password.')
 
-      Superuser powers means that this use is an admin that can do anything
-      they want.
-      """
-      if password is None:
-          raise TypeError('Superusers must have a password.')
+            """Create and return a `User` with superuser powers.
 
-      user = self.create_user(username, email, password)
-      user.is_superuser = True
-      user.is_staff = True
-      user.save()
+            Superuser powers means that this use is an admin that can do anything
+            they want."""
+            if password is None:
+                raise TypeError('Superusers must have a password.')
 
-      return user
+
+            user = self.create_user(username, email, password)
+            user.is_superuser = True
+            user.is_staff = True
+            user.save()
+
+            return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):

@@ -1,6 +1,9 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
+<<<<<<< HEAD
 import json
+=======
+>>>>>>> parent of aaa0d6f... #161340174 Fix failing models again
 
 
 class TestAuthentication(TestCase):
@@ -10,18 +13,25 @@ class TestAuthentication(TestCase):
             "user": {
                 "email": "johndoe@example.com",
                 "username": "johndoe",
+<<<<<<< HEAD
                 "password": "Password123"
+=======
+                "password": "password"
+>>>>>>> parent of aaa0d6f... #161340174 Fix failing models again
             }
         }
 
     def create_user(self):
         return self.client.post("/api/users/", self.user_data)
 
+<<<<<<< HEAD
       
     def login_user(self):
         self.create_user()
         return self.client.post("/api/users/login/", self.user_data)
 
+=======
+>>>>>>> parent of aaa0d6f... #161340174 Fix failing models again
     def test_create_users_returns_201_status_code(self):
         response = self.create_user()
         self.assertEqual(response.status_code, 201)
@@ -32,6 +42,7 @@ class TestAuthentication(TestCase):
             response.data['username'],
             self.user_data["user"]["username"]
         )
+<<<<<<< HEAD
     def test_successfull_user_registeration_response_has_token(self):
         response = self.create_user()
         self.assertIn('token', response.data)
@@ -96,3 +107,5 @@ class TestAuthentication(TestCase):
         response = self.login_user()
         self.assertIn('token', response.data)
 
+=======
+>>>>>>> parent of aaa0d6f... #161340174 Fix failing models again
