@@ -26,8 +26,3 @@ class TestAuthentication(TestCase):
             response.data['username'],
             self.user_data["user"]["username"]
         )
-
-    def test_login_user_returns_200_status_code(self):
-        self.create_user()
-        response = self.client.post("/api/users/login/", self.user_data)
-        self.assertEqual(response.status_code, 200)
