@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -183,3 +184,11 @@ JWT = {
     'EXPIRATION_IN_MINUTES': 60,
     'TOKEN_PREFIX': 'bearer'
 }
+
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=authors',
+    '--cover-tests',
+]
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
