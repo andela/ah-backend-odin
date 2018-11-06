@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'authors.apps.core',
     'authors.apps.profiles',
     'authors.apps.articles',
-    'django_nose',
     'taggit',
     'taggit_serializer',
 ]
@@ -188,12 +187,5 @@ JWT = {
     'TOKEN_PREFIX': 'bearer'
 }
 
-NOSE_ARGS = [
-    '--with-coverage',
-    '--cover-package=authors',
-    '--cover-tests',
-]
-
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 TAGGIT_CASE_INSENSITIVE = True
