@@ -43,13 +43,16 @@ INSTALLED_APPS = [
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
+    'authors.apps.articles',
     'django_nose',
+    'taggit',
+    'taggit_serializer',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -192,3 +195,5 @@ NOSE_ARGS = [
 ]
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+TAGGIT_CASE_INSENSITIVE = True
