@@ -1,8 +1,7 @@
 [![Build Status](https://travis-ci.org/andela/ah-backend-odin.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-odin)
-
+[![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-odin/badge.svg)](https://coveralls.io/github/andela/ah-backend-odin)
 Authors Haven - A Social platform for the creative at heart.
 =======
-[![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-odin/badge.svg)](https://coveralls.io/github/andela/ah-backend-odin)
 
 ## Authors Haven Heroku Link
 [Link to App on Heroku!](https://authors-haven-odin.herokuapp.com/admin/)
