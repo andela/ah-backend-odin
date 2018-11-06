@@ -10,8 +10,8 @@ from taggit.managers import TaggableManager
 class Article(models.Model):
 
 
-    title = models.CharField(db_index= True, max_length =255)
-    description = models.CharField(max_length =255, primary_key = True)
+    title = models.CharField(db_index= True, max_length = 255)
+    description = models.CharField(db_index=True, max_length = 255)
     body = models.TextField()
     created_at = models.DateField(auto_now_add=True)
     published = models.BooleanField()
