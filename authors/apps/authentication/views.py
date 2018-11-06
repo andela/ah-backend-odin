@@ -43,13 +43,17 @@ class ActivationAPIView(APIView):
             user = User.objects.get(email=email)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
+            
+        if user.is_active == True:
+            return Response({'message':'Activation link has already been used and has expired!'}, status=status.HTTP_403_FORBIDDEN)
+
         if user is not None and default_token_generator.check_token(user, token):
             user.is_active = True
             user.save()
             
             return Response({'message':'Thank you for your email confirmation. Now you can login your account.'}, status=status.HTTP_200_OK)
         else:
-            return Response({'message':'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message':'Activation link is invalid!'}, status=status.HTTP_408_REQUEST_TIMEOUT)
 
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
