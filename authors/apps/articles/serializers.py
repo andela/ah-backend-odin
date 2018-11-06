@@ -10,9 +10,7 @@ class CreateArticleAPIViewSerializer(TaggitSerializer,serializers.ModelSerialize
     def get_author(self,obj):
         user = {
             "username":obj.author.username,
-            "email":obj.author.email,
-            "bio":obj.author.bio,
-            "image":obj.author.bio
+            "email":obj.author.email
         }
         return user
 
@@ -20,7 +18,7 @@ class CreateArticleAPIViewSerializer(TaggitSerializer,serializers.ModelSerialize
     class Meta:
         model = Article
 
-        fields = ['description', 'body', 'author', 'created_at', 'updated_at', 'tags', 'slug', 'published', 'image']
+        fields = ['title','description', 'body', 'author', 'created_at', 'updated_at', 'tags', 'slug', 'published', 'image']
 
     def validate_title(self, value):
         if len(value) > 50:
