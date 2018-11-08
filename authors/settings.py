@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'rest_framework',
-
+    
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'taggit',
     'taggit_serializer',
     'authors.apps.reporter',
+    'authors.apps.PasswordResetToken',
+
 ]
 
 MIDDLEWARE = [
@@ -188,5 +190,13 @@ JWT = {
     'TOKEN_PREFIX': 'bearer'
 }
 
-
 TAGGIT_CASE_INSENSITIVE = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+
+BASE_URL = 'http://127.0.0.1:8000'
+
