@@ -10,6 +10,7 @@ from .serializers import ReportedArticleSerializer
 from .models import ReportArticle
 
 from ..articles.models import Article
+from ..authentication.models import User
 from ..authentication.backends import JWTAuthentication
 
 
@@ -21,12 +22,9 @@ class ReportingAPIView(APIView):
     def post(self, request, slug):
         
         report = request.data.get('report', {})
-        user = JWTAuthentication().authenticate(request)
-
-        report['user'] = user[0].pk
         article = Article.objects.get(slug=slug)
 
-        print(article)
+        report['user'] = article.author_id
         report['article'] = article.id
 
         serializer = self.serializer_class(data=report)
