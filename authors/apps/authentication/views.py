@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import re
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer
@@ -15,6 +16,18 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from .models import User
+from rest_framework.response import Response
+
+from django.conf import settings
+from rest_framework.decorators import api_view
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+from authors.apps.PasswordResetToken.models import Token
+
+from django.utils.timezone import now
+
+import uuid
+
 
 class RegistrationAPIView(APIView):
     # Allow any user (authenticated or not) to hit this endpoint.
@@ -99,3 +112,77 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['GET', 'POST'])
+def password_reset(request):
+    if request.method == 'POST':
+ 
+        token = uuid.uuid4()
+        email = request.data.get('email')
+
+        user = get_object_or_404(User, email=email)
+        
+        Token.objects.create(
+            token=token,
+            email=user.email
+        )
+
+        url = f'http://127.0.0.1:8000/api/reset_password/?token={token}'
+        
+        message = f'Please click the link to reset your password\n {url} \n {token}'
+
+        send_mail(
+            'Password Reset Link',
+            message,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=False,
+        )
+
+        return Response({"message": "email sent", "data": request.data})
+    return Response({"message": "Great Work, TeamOdin"})
+
+@api_view(['GET'])
+def reset_password(request):
+
+    token = request.GET['token'].strip()
+    token = get_object_or_404(Token, token=token)
+
+    time_created = token.created_at
+    current_time = now()
+    diff = current_time - time_created
+    hours = round(diff.total_seconds()/3600)
+    
+    data = {
+                'token_status': False
+        }
+
+    if token:
+        data['token_status'] = True
+        if hours > 4: 
+            return Response({'message': 'Password reset token only valid for 4 hours, please re-try to reset your password', "data": data})
+        
+        return Response({"message": "Token Exists And It's Valid, allow password reset", "data": data})
+    else:
+        return Response({"message": "Token  does not Exist, password reset request denied", "data": data})
+
+@api_view(['POST'])
+def change_passowrd(request): 
+    if request.method == 'POST':
+        data = {}
+        email = request.POST['email']
+        user = User.objects.get(email=email)
+        
+        if user: 
+            password = request.POST['password'].strip()
+            if validate_password(password) == True:
+                user.set_password(password)
+                user.save() 
+                data['message'] = 'Password Successfully Updated!'
+            else:
+                data['message'] = 'Password Does Not Meet All Requirements(Must Be At Least 8 Characters, Mixed Capital,Symbols and Lower Cases'
+        else:
+            data['message'] = f"User with email address {email} does not exist"
+        return Response(data=data)
+        
+def validate_password(password):
+  return bool(re.match(r"[A-Za-z0-9@#$%^&+=]{8,}", password))
