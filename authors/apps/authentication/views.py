@@ -10,9 +10,13 @@ from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer
 )
 
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
+from .models import User
 from rest_framework.response import Response
-
-from django.contrib.auth import get_user_model
 
 from django.conf import settings
 from rest_framework.decorators import api_view
@@ -23,7 +27,6 @@ from authors.apps.PasswordResetToken.models import Token
 from django.utils.timezone import now
 
 import uuid
-User = get_user_model()
 
 
 class RegistrationAPIView(APIView):
@@ -44,6 +47,26 @@ class RegistrationAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+class ActivationAPIView(APIView):
+    permission_classes = (AllowAny,)
+    
+    def get(self, request, uidb64, token):
+        try:
+            email = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(email=email)
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+            
+        if user.is_active == True:
+            return Response({'message':'Activation link has already been used and has expired!'}, status=status.HTTP_403_FORBIDDEN)
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            
+            return Response({'message':'Thank you for your email confirmation. Now you can login your account.'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message':'Activation link is invalid!'}, status=status.HTTP_408_REQUEST_TIMEOUT)
 
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)

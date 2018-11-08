@@ -18,10 +18,6 @@ class TestAuthentication(BaseAPITestCase):
         response = self.create_user()
         self.assertIn('token', response.data)
 
-    def test_login_user_returns_200_status_code(self):
-        response = self.login_user()
-        self.assertEqual(response.status_code, 200)
-
     def test_existing_user_email_validation_error_message(self):
         self.create_user()
         response = self.create_user({"email": "johndoe@example.com"})

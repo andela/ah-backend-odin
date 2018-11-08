@@ -184,13 +184,13 @@ JWT = {
     'EXPIRATION_IN_MINUTES': 60,
     'TOKEN_PREFIX': 'bearer'
 }
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'authorshaventia@gmail.com'
-EMAIL_HOST_PASSWORD = 'tia0987654321'
-EMAIL_PORT = 25
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'TeamOdin <noreply@example.com>'
-# SENDGRID_API_KEY='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'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+
+BASE_URL = 'http://127.0.0.1:8000'
 
