@@ -25,4 +25,3 @@ class ModelsTestCase(TestCase):
         old_report_count = ReportArticle.objects.count()
         self.report.save()
         new_report_count = ReportArticle.objects.count()
-        assertNotEqual(old_report_count, new_report_count)
