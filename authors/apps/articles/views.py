@@ -1,16 +1,21 @@
 import uuid
-from rest_framework import generics
-from .models import Article
-from .serializers import CreateArticleAPIViewSerializer, UpdateArticleAPIVIEWSerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .renderers import ArticleJSONRenderer
-from django.template.defaultfilters import slugify
-from ..authentication.backends import JWTAuthentication
-from rest_framework.response import Response
-from rest_framework import status
-from ..authentication.models import User
+import jwt
+from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.template.defaultfilters import slugify
+from rest_framework import generics, status
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
 
+from ..authentication.backends import JWTAuthentication
+from ..authentication.models import User
+from .models import Article
+from .renderers import ArticleJSONRenderer
+from .serializers import (ArticleDetailSerializer,
+                          CreateArticleAPIViewSerializer,
+                          UpdateArticleAPIVIEWSerializer)
 
 class ListCreateArticleAPIView(generics.ListCreateAPIView):
 
@@ -21,9 +26,7 @@ class ListCreateArticleAPIView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def create(self, request):
-        """
-            This method creates user articles
-        """
+        """This method creates user articles"""
         article = request.data.get('article', {})
         user_info = JWTAuthentication().authenticate(request)
         article['author'] = user_info[0]
@@ -43,12 +46,12 @@ class ListCreateArticleAPIView(generics.ListCreateAPIView):
 class UpdateDestroyArticleAPIView(generics.RetrieveUpdateDestroyAPIView):
     
     serializer_class = UpdateArticleAPIVIEWSerializer
+    detailSerializer = ArticleDetailSerializer
+    
 
     def update(self, request, slug):
 
-        """
-            This method updates a user article
-        """
+        """This method updates a user article"""
         article = request.data.get('article', {})
         user_info = JWTAuthentication().authenticate(request)
         article["author"] = user_info[0].pk
@@ -58,8 +61,16 @@ class UpdateDestroyArticleAPIView(generics.RetrieveUpdateDestroyAPIView):
         slug = slug + "-" + str(uuid.uuid4()).split("-")[-1]
         article["slug"] = slug
 
+        token = request.META.get('HTTP_AUTHORIZATION', ' ').split(' ')[1]
+        payload = jwt.decode(token, settings.SECRET_KEY, 'utf-8')
+        author_name = payload['username']
+        user = User.objects.filter(username=author_name).first()
+        
         serializer = self.serializer_class(data=article)
         serializer.is_valid(raise_exception=True)
+        if article_instance.author != user:
+            raise PermissionDenied
+        
         serializer.update_article(article,article_instance)
         data = serializer.data
         data["message"] = "Article updated successfully."
