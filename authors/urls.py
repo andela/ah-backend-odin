@@ -19,7 +19,7 @@ from django.urls import path, re_path, include
 from authors.apps.authentication.views import(
     password_reset,
     reset_password,
-    change_passowrd,
+    change_passowrd
 )
 
 app_name = "authentication"
@@ -27,9 +27,16 @@ app_name = "authentication"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('authors.apps.authentication.urls')),
-    re_path(r'^api/set_password/complete/', change_passowrd, name='change_passowrd'),
+    re_path(
+        r'^api/set_password/complete/',
+        change_passowrd, name='change_passowrd'
+    ),
     re_path(r'^api/password_reset/', password_reset, name='password'),
     re_path(r'^api/reset_password/', reset_password, name='reset_password'),
-    re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/articles/', include('authors.apps.articles.urls')),
+    re_path(
+        r'^api-auth/',
+        include('rest_framework.urls', namespace='rest_framework')
+    ),
+    path('api/', include('authors.apps.profiles.urls')),
 ]

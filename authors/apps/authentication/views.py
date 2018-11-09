@@ -1,26 +1,30 @@
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import re
+
+from .models import User
+
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer
+    LoginSerializer,
+    RegistrationSerializer,
+    UserSerializer,
+    UserWithProfileSerializer
 )
+
 
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
-from .models import User
-from rest_framework.response import Response
 
-from django.conf import settings
 from rest_framework.decorators import api_view
-from django.core.mail import send_mail
+
 from django.shortcuts import get_object_or_404
 from authors.apps.PasswordResetToken.models import Token
 
@@ -47,26 +51,28 @@ class RegistrationAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 class ActivationAPIView(APIView):
     permission_classes = (AllowAny,)
-    
+
     def get(self, request, uidb64, token):
         try:
             email = force_text(urlsafe_base64_decode(uidb64))
             user = User.objects.get(email=email)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
-            
+
         if user.is_active == True:
-            return Response({'message':'Activation link has already been used and has expired!'}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'message': 'Activation link has already been used and has expired!'}, status=status.HTTP_403_FORBIDDEN)
 
         if user is not None and default_token_generator.check_token(user, token):
             user.is_active = True
             user.save()
-            
-            return Response({'message':'Thank you for your email confirmation. Now you can login your account.'}, status=status.HTTP_200_OK)
+
+            return Response({'message': 'Thank you for your email confirmation. Now you can login your account.'}, status=status.HTTP_200_OK)
         else:
-            return Response({'message':'Activation link is invalid!'}, status=status.HTTP_408_REQUEST_TIMEOUT)
+            return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_408_REQUEST_TIMEOUT)
+
 
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
@@ -112,22 +118,23 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @api_view(['GET', 'POST'])
 def password_reset(request):
     if request.method == 'POST':
- 
+
         token = uuid.uuid4()
         email = request.data.get('email')
 
         user = get_object_or_404(User, email=email)
-        
+
         Token.objects.create(
             token=token,
             email=user.email
         )
 
         url = f'http://127.0.0.1:8000/api/reset_password/?token={token}'
-        
+
         message = f'Please click the link to reset your password\n {url} \n {token}'
 
         send_mail(
@@ -141,6 +148,7 @@ def password_reset(request):
         return Response({"message": "email sent", "data": request.data})
     return Response({"message": "Great Work, TeamOdin"})
 
+
 @api_view(['GET'])
 def reset_password(request):
 
@@ -150,39 +158,47 @@ def reset_password(request):
     time_created = token.created_at
     current_time = now()
     diff = current_time - time_created
-    hours = round(diff.total_seconds()/3600)
-    
+    hours = round(diff.total_seconds() / 3600)
+
     data = {
-                'token_status': False
-        }
+        'token_status': False
+    }
 
     if token:
         data['token_status'] = True
-        if hours > 4: 
+        if hours > 4:
             return Response({'message': 'Password reset token only valid for 4 hours, please re-try to reset your password', "data": data})
-        
+
         return Response({"message": "Token Exists And It's Valid, allow password reset", "data": data})
     else:
         return Response({"message": "Token  does not Exist, password reset request denied", "data": data})
 
+
 @api_view(['POST'])
-def change_passowrd(request): 
+def change_passowrd(request):
     if request.method == 'POST':
         data = {}
         email = request.POST['email']
         user = User.objects.get(email=email)
-        
-        if user: 
+
+        if user:
             password = request.POST['password'].strip()
             if validate_password(password) == True:
                 user.set_password(password)
-                user.save() 
+                user.save()
                 data['message'] = 'Password Successfully Updated!'
             else:
                 data['message'] = 'Password Does Not Meet All Requirements(Must Be At Least 8 Characters, Mixed Capital,Symbols and Lower Cases'
         else:
             data['message'] = f"User with email address {email} does not exist"
         return Response(data=data)
-        
+
+
 def validate_password(password):
-  return bool(re.match(r"[A-Za-z0-9@#$%^&+=]{8,}", password))
+    return bool(re.match(r"[A-Za-z0-9@#$%^&+=]{8,}", password))
+
+
+class ListUserWithProfiles(ListAPIView):
+    queryset = User.objects.all().prefetch_related("profile")
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserWithProfileSerializer
