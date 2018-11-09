@@ -1,19 +1,110 @@
+<h1 align="center">Authors Haven (Backend)</h1>
+
+[![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-odin/badge.svg)](https://coveralls.io/github/andela/ah-backend-odin)
 [![Build Status](https://travis-ci.org/andela/ah-backend-odin.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-odin)
 
-Authors Haven - A Social platform for the creative at heart.
-=======
-[![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-odin/badge.svg)](https://coveralls.io/github/andela/ah-backend-odin)
+## About Authors Haven
 
-## Authors Haven Heroku Link
-[Link to App on Heroku!](https://authors-haven-odin.herokuapp.com/admin/)
+A Social platform for like-minded authors to foster inspiration and innovation by leveraging the modern web to enable authors share original content, target articles to an audience that finds them relevant and more.
 
-## Vision
-Create a community of like minded authors to foster inspiration and innovation
-by leveraging the modern web.
+# Online demo
 
----
+A working demo can be found [here](https://authors-haven-odin.herokuapp.com/admin/)
+
+## Getting Started
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+Ensure that you have the following tools available on your machine;
+
+- [Git](https://git-scm.com/) A distributed version control system
+- [Python](https://www.python.org/) A general purpose programming language
+- [Postgresql](https://www.postgresql.org/) An open source relational database
+- A tool to create isolated Python environments preferably [Virtualenv](https://virtualenv.pypa.io/en/stable/)
+- [Pip](https://pypi.org/project/pip/) A tool for installing python packages
+
+### Installing
+
+While in your preferred terminal;
+
+Start by cloning the repository to your local machine
+
+```bash
+git clone https://github.com/andela/ah-backend-odin.git
+
+cd ah-backend-odin/
+```
+
+Make and activate a python virtual environment using `virtualenv`
+
+```bash
+virtualenv venv
+
+source venv/bin/activate
+```
+
+With the virtual environment activated, install the project dependencies
+
+```bash
+pip3 install -r requirements.txt
+```
+
+## Database configuration
+
+The project uses [Postgresql](https://www.postgresql.org/) database engine to persist data
+and uses the default settings.
+
+```json
+{
+  "DB_NAME": "authors",
+  "DB_USER": "postgres",
+  "DB_HOST": "localhost",
+  "DB_PORT": "5432",
+  "DB_PASSWORD": ""
+}
+```
+
+You can override the configuration key and value by setting a corresponding environment variable eg
+
+```bash
+# To overide the DB_NAME
+export DB_NAME=authors_haven
+```
+
+## Making migrations
+
+The application migrations files are not pushed to github so you will have to generate them on your own.
+
+After you have succeeded with the database setup, run the following commands
+
+```bash
+# Create the migrations from the applications models
+python3 manage.py makemigrations
+
+# Execute the generate migrations on the database .
+python3 manage.py migrate
+```
+
+## Running the tests
+
+Trigger the application tests by running
+
+```bash
+python3 manage.py tests
+```
+
+## Serving the application
+
+You can start a local server by running
+
+```bash
+python3 manage.py runserver
+```
 
 ## API Spec
+
 The preferred JSON object to be returned by the API should be structured as follows:
 
 ### Users (for authentication)
@@ -29,7 +120,9 @@ The preferred JSON object to be returned by the API should be structured as foll
   }
 }
 ```
+
 ### Profile
+
 ```source-json
 {
   "profile": {
@@ -40,7 +133,9 @@ The preferred JSON object to be returned by the API should be structured as foll
   }
 }
 ```
+
 ### Single Article
+
 ```source-json
 {
   "article": {
@@ -62,7 +157,9 @@ The preferred JSON object to be returned by the API should be structured as foll
   }
 }
 ```
+
 ### Multiple Articles
+
 ```source-json
 {
   "articles":[{
@@ -102,7 +199,9 @@ The preferred JSON object to be returned by the API should be structured as foll
   "articlesCount": 2
 }
 ```
+
 ### Single Comment
+
 ```source-json
 {
   "comment": {
@@ -119,7 +218,9 @@ The preferred JSON object to be returned by the API should be structured as foll
   }
 }
 ```
+
 ### Multiple Comments
+
 ```source-json
 {
   "comments": [{
@@ -137,7 +238,9 @@ The preferred JSON object to be returned by the API should be structured as foll
   "commentsCount": 1
 }
 ```
+
 ### List of Tags
+
 ```source-json
 {
   "tags": [
@@ -146,7 +249,9 @@ The preferred JSON object to be returned by the API should be structured as foll
   ]
 }
 ```
+
 ### Errors and Status Codes
+
 If a request fails any validations, expect errors in the following format:
 
 ```source-json
@@ -158,16 +263,16 @@ If a request fails any validations, expect errors in the following format:
   }
 }
 ```
+
 ### Other status codes:
+
 401 for Unauthorized requests, when a request requires authentication but it isn't provided
 
 403 for Forbidden requests, when a request may be valid but the user doesn't have permissions to perform the action
 
 404 for Not found requests, when a resource can't be found to fulfill the request
 
-
-Endpoints:
-----------
+## Endpoints:
 
 ### Authentication:
 
@@ -397,6 +502,12 @@ No additional parameters required
 
 `GET /api/tags`
 
+## Built With
 
+- [Django](https://docs.djangoproject.com/en/2.1/) -A python web framework
+- [Django REST Framework](https://maven.apache.org/) - A flexible toolkit for building Web APIs in Django
 
+## Authors
+
+See also the list of [contributors](https://github.com/andela/ah-backend-odin/graphs/contributors) who participated in this project.
 
