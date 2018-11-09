@@ -17,7 +17,11 @@ class Article(models.Model):
     published = models.BooleanField()
     updated_at = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+<<<<<<< HEAD
     tags = TaggableManager(blank=True)
+=======
+    tagList = TaggableManager(blank=True)
+>>>>>>> c0ac52dcb053bc85fb8dc2e92cd627173223d9cb
     slug = models.SlugField(max_length=255, unique=True)
     image = models.TextField(null=True, blank=True)
 
