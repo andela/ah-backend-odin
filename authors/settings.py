@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'authors.apps.core',
     'authors.apps.profiles',
     'authors.apps.PasswordResetToken',
+    'authors.apps.articles',
+    'taggit',
+    'taggit_serializer',
 ]
 
 MIDDLEWARE = [
@@ -194,3 +197,4 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT')
 
 BASE_URL = 'http://127.0.0.1:8000'
 
+TAGGIT_CASE_INSENSITIVE = True
