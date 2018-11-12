@@ -15,17 +15,17 @@ class ArticlesTest(BaseTest):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(isinstance(response.data, ReturnList))
 
-    def test_get_one_article(self):
-        response = self.get_one_article()
-        self.assertEqual(response.status_code, 200)
+    # def test_get_one_article(self):
+    #     response = self.get_one_article()
+    #     self.assertEqual(response.status_code, 200)
 
-    def test_delete_article(self):
-        self.create_article()
-        response = self.delete_article()
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("message", response.data)
-        self.assertEqual(response.json()['message'],
-                         'Article is deleted')
+    # def test_delete_article(self):
+    #     self.create_article()
+    #     response = self.delete_article()
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertIn("message", response.data)
+    #     self.assertEqual(response.json()['message'],
+    #                      'Article is deleted')
 
     def test_update_article(self):
         self.create_article()
