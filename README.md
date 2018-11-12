@@ -251,7 +251,6 @@ The preferred JSON object to be returned by the API should be structured as foll
 ```
 
 ### Errors and Status Codes
-
 If a request fails any validations, expect errors in the following format:
 
 ```source-json
