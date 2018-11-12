@@ -3,6 +3,7 @@ from rest_framework.test import APIClient
 import json
 
 
+
 class BaseTest(TestCase):
     def setUp(self):
         self.client = APIClient(content_type="application/json")
@@ -41,16 +42,25 @@ class BaseTest(TestCase):
                 "published":"True"
             }
         }
+
+        self.report_data = {"report" : 
+                                {
+                                    "reason" : "this is a plagiared article"
+                                }
+                            }
         
         
         self.token = dict(self.login_user().data)['token']
         self.headers = {'HTTP_AUTHORIZATION': f'Bearer {self.token}'}
         self.slug = dict(self.create_article().data)['slug']
         
+        
+        
 
 
     def create_user(self):
         return self.client.post("/api/users/", self.user_data)
+        
 
       
     def login_user(self):
