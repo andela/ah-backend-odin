@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
-
+from authors.apps.profiles.serializers import ProfileSerializer
 from .models import User
 
 import re
@@ -182,3 +182,11 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class UserWithProfileSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = ('email', 'username', 'profile')
