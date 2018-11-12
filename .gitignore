@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.vscode
+migrations/
 
 # C extensions
 *.so
@@ -39,6 +41,7 @@ pip-delete-this-directory.txt
 htmlcov/
 .tox/
 .coverage
+.DS_Store
 .coverage.*
 .cache
 nosetests.xml
@@ -91,3 +94,8 @@ ENV/
 
 # SQLite3
 db.sqlite3
+.bash_profile
+authors/apps/PasswordResetToken/migrations/0001_initial.py
+authors/apps/PasswordResetToken/migrations/__init__.py
+authors/apps/PasswordResetToken/migrations/0001_initial.py
+authors/apps/PasswordResetToken/migrations/0001_initial.py

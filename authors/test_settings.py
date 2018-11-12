@@ -24,7 +24,7 @@ SECRET_KEY = '7pgozr2jn7zs_o%i8id6=rddie!*0f0qy3$oy$(8231i^4*@u3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['authors-haven-odin.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -39,30 +39,24 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'rest_framework',
-    
+
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
-    'authors.apps.articles',
-    'taggit',
-    'taggit_serializer',
     'authors.apps.reporter',
-    'authors.apps.PasswordResetToken',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    # 'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 ROOT_URLCONF = 'authors.urls'
 
 TEMPLATES = [
@@ -86,39 +80,12 @@ WSGI_APPLICATION = 'authors.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-
-# Heroku Database Config
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DB_NAME', 'authors'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
-
-# Local Postgres Database Config
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'authors_haven',
-#         'USER': 'postgres',
-#         'PASSWORD': 'password',
-#         'HOST': '127.0.0.1',
-#         'PORT': '5432',
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -154,10 +121,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = 'staticfiles/'
-
-MEDIA_ROOT = "media/"
+STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = (
     '0.0.0.0:4000',
@@ -173,31 +137,8 @@ AUTH_USER_MODEL = 'authentication.User'
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'authors.apps.core.exceptions.core_exception_handler',
     'NON_FIELD_ERRORS_KEY': 'error',
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
-    'TEST_REQUEST_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
 
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'authors.apps.authentication.backends.JWTAuthentication',
-    ),
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'authors.apps.authentication.backends.JWTAuthentication',
+    # ),
 }
-
-JWT = {
-    # The algorithm to use for encoding and decoding jwt tokens
-    'ALGORITHM': 'HS256',
-    'EXPIRATION_IN_MINUTES': 60,
-    'TOKEN_PREFIX': 'bearer'
-}
-
-TAGGIT_CASE_INSENSITIVE = True
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS = True
-EMAIL_HOST = os.environ.get('EMAIL_HOST')
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_PORT = os.environ.get('EMAIL_PORT')
-
-BASE_URL = 'http://127.0.0.1:8000'
-
-TAGGIT_CASE_INSENSITIVE = True
