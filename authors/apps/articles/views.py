@@ -20,14 +20,10 @@ from ..authentication.backends import JWTAuthentication
 from ..authentication.models import User
 from .models import Article, BookmarkingArticles
 from .renderers import ArticleJSONRenderer
-
-
-from .serializers import (
-    ArticleDetailSerializer,
-    CreateArticleAPIViewSerializer,
-    UpdateArticleAPIVIEWSerializer
-)
-
+from .serializers import (ArticleDetailSerializer,
+                          CreateArticleAPIViewSerializer,
+                          UpdateArticleAPIVIEWSerializer,
+                          LikeArticleAPIViewSerializer)
 
 class ListCreateArticleAPIView(generics.ListCreateAPIView):
 
@@ -139,3 +135,33 @@ class BookMarkArticleAPIView(generics.ListCreateAPIView):
             }),
             content_type="application/json"
         )
+
+
+class LikeArticleAPIView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (ArticleJSONRenderer,)
+    serializer_class = LikeArticleAPIViewSerializer
+
+    def post(self, request, slug):
+
+        """This method allows user to like and dislike an article"""
+
+        like = request.data.get('article', {})
+
+        user_info = JWTAuthentication().authenticate(request)
+        like["author"] = user_info[0].pk
+
+        article_instance = get_object_or_404(Article, slug=slug)
+        like["article"] = article_instance.pk
+        
+        serializer = self.serializer_class(data=like)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+
+        if serializer.action_performed == "created":
+            action_status = status.HTTP_201_CREATED
+        else:
+            action_status = status.HTTP_201_CREATED
+        return Response(serializer.data, status=action_status)
+
