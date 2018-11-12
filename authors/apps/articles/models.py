@@ -24,19 +24,18 @@ class Article(models.Model):
 
     @property
     def likescount(self):
-        return ArticleLikes.objects.filter(article_like=True).count()
+        return ArticleLikes.objects.filter(article_like=True, article=self).count()
 
     @property
     def dislikescount(self):
-        return ArticleLikes.objects.filter(article_like=False).count()
-
-
-    objects = models.Manager()
+        return ArticleLikes.objects.filter(article_like=False, article=self).count()
     
     @property
     def comments(self):
         comments = Comment.objects.filter(article=self.id).values()
         return [ dict(comment) for comment in comments]
+    
+    objects = models.Manager()
 
 
 class BookmarkingArticles(models.Model):
@@ -64,9 +63,6 @@ class Rating(models.Model):
     updated_at = models.DateField(auto_now=True)
 
 
-
-
-
 class FavoriteArticle(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     favorite_status = models.BooleanField(default=False)
@@ -87,5 +83,4 @@ class Thread(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
-    
 

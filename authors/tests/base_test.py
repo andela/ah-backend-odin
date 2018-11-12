@@ -221,5 +221,3 @@ class BaseTest(TestCase):
         return self.client.post(f"/api/articles/{self.wrong_slug}/comments", 
         self.comment_data, **self.headers)  
 
-
-
