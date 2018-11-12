@@ -8,10 +8,6 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-from django.core.mail import send_mail
 
 class UserManager(BaseUserManager):
   """
@@ -34,20 +30,6 @@ class UserManager(BaseUserManager):
     user = self.model(username=username, email=self.normalize_email(email))
     user.set_password(password)
     user.save()
-
-    token = default_token_generator.make_token(user)
-
-    mail_subject = 'Activate your Authors Haven account.'
-    domain = settings.BASE_URL
-    uid = urlsafe_base64_encode(force_bytes(email))
-
-    template = '''Hi {},
-    Please click on the link to confirm your registration,
-    {}/api/users/verify/{}/{}'''.format(username, domain, uid.decode('utf-8'), token)
-
-
-    send_mail(mail_subject, template, 'authorshaventia@gmail.com', [email])
-
 
     return user
 
