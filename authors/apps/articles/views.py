@@ -1,4 +1,5 @@
 import uuid
+import json
 
 import jwt
 from django.conf import settings
@@ -9,14 +10,16 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
+from django.http import HttpResponse
+from django.contrib import auth
 
 from ..authentication.backends import JWTAuthentication
 from ..authentication.models import User
-from .models import Article
+from .models import Article, BookmarkingArticles
 from .renderers import ArticleJSONRenderer
 from .serializers import (ArticleDetailSerializer,
                           CreateArticleAPIViewSerializer,
-                          UpdateArticleAPIVIEWSerializer)
+                          UpdateArticleAPIVIEWSerializer,)
 
 
 class ListCreateArticleAPIView(generics.ListCreateAPIView):
@@ -99,3 +102,33 @@ class UpdateDestroyArticleAPIView(generics.RetrieveUpdateDestroyAPIView):
         serializer = self.detailSerializer()
         serializer.instance = article_instance
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class BookMarkArticleAPIView(generics.ListCreateAPIView):
+
+
+    renderer_classes = (ArticleJSONRenderer, )
+    queryset = Article.objects.all()
+    permission_classes = (IsAuthenticated,)
+    model = BookmarkingArticles
+
+    def post(self, request, slug):
+    
+        user = request.user
+        
+        article_id= get_object_or_404(Article, slug=slug)
+
+        # Trying to get a bookmark from the table, or create a new one
+        bookmark, created = self.model.objects.get_or_create(user=user, article_id=article_id)
+        # If no new bookmark has been created,
+        # Then we believe that the request was to delete the bookmark
+        if not created:
+            bookmark.delete()
+
+        return HttpResponse(
+            json.dumps({
+                "result": created,
+                "count": self.model.objects.filter(article_id=article_id).count()
+            }),
+            content_type="application/json"
+        )
+

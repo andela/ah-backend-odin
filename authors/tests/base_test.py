@@ -76,3 +76,6 @@ class BaseTest(TestCase):
     def update_article(self):
         return self.client.put(f"/api/articles/{self.slug}", self.article_data, **self.headers)
     
+    def bookmark_article(self):
+        return self.client.post(f"/api/articles/{self.slug}/bookmark", **self.headers)
+    

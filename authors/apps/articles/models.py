@@ -20,4 +20,12 @@ class Article(models.Model):
     tagList = TaggableManager(blank=True)
     slug = models.SlugField(max_length=255, unique=True)
     image = models.TextField(null=True, blank=True)
+    objects = models.Manager()
+
+class BookmarkingArticles(models.Model):
+ 
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    article_id = models.ForeignKey(Article, on_delete=models.CASCADE)
+    bookmarked_at = models.DateTimeField(auto_now_add=True)
+    objects = models.Manager()
 
