@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'rest_framework',
-    
+
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
@@ -58,7 +58,7 @@ SWAGGER_SETTINGS = {
             'in': 'header',
             'name': 'Authorization'
         }
-    }, 
+    },
 }
 
 MIDDLEWARE = [
@@ -165,7 +165,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles/'
 
 MEDIA_ROOT = "media/"
@@ -211,4 +211,3 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT')
 BASE_URL = 'http://127.0.0.1:8000'
 
 TAGGIT_CASE_INSENSITIVE = True
-
