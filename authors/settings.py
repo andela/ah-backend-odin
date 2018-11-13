@@ -48,7 +48,18 @@ INSTALLED_APPS = [
     'taggit',
     'taggit_serializer',
     'authors.apps.reporter',
+    'drf_yasg',
 ]
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    }, 
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -200,3 +211,4 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT')
 BASE_URL = 'http://127.0.0.1:8000'
 
 TAGGIT_CASE_INSENSITIVE = True
+

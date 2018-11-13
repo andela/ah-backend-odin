@@ -30,6 +30,7 @@ class Migration(migrations.Migration):
                 ('image', models.TextField(blank=True, null=True)),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('tagList', taggit.managers.TaggableManager(blank=True, help_text='A comma-separated list of tags.', through='taggit.TaggedItem', to='taggit.Tag', verbose_name='Tags')),
+<<<<<<< HEAD
             ],
         ),
         migrations.CreateModel(
@@ -39,6 +40,8 @@ class Migration(migrations.Migration):
                 ('bookmarked_at', models.DateTimeField(auto_now_add=True)),
                 ('article_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='articles.Article')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+=======
+>>>>>>> feat(api):Document API using swagger
             ],
         ),
     ]
