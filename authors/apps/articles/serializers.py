@@ -86,7 +86,6 @@ class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
         article_instance.image = validated_data.get('image')
         article_instance.tagList = validated_data.get('tagList')
         article_instance.save()
-        
         return article_instance 
 
 class RatingsSerializer(serializers.ModelSerializer):
