@@ -19,7 +19,7 @@ class CreateArticleAPIViewSerializer(TaggitSerializer,serializers.ModelSerialize
     class Meta:
         model = Article
 
-        fields = ['title','description', 'body', 'author', 
+        fields = ['id','title','description', 'body', 'author', 
                     'created_at', 'updated_at', 'tagList', 'slug', 'published', 'image']
 
     def validate_title(self, value):
