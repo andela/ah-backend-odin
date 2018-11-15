@@ -211,3 +211,5 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT')
 BASE_URL = 'http://127.0.0.1:8000'
 
 TAGGIT_CASE_INSENSITIVE = True
+
+WPM = 200

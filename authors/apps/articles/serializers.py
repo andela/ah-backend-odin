@@ -22,7 +22,7 @@ class CreateArticleAPIViewSerializer(TaggitSerializer,serializers.ModelSerialize
         model = Article
 
         fields = ['title','description', 'body', 'author', 
-                    'created_at', 'updated_at', 'tagList', 'slug', 'published', 'image', 'likescount', 'dislikescount']
+                    'created_at', 'updated_at', 'tagList', 'slug', 'published', 'image', 'likescount', 'dislikescount', 'read_time']
 
     def validate_title(self, value):
         if len(value) > 50:
@@ -46,7 +46,7 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
 
         fields = ['title','description', 'body', 'author', 
                     'created_at', 'updated_at', 'tagList', 
-                        'slug', 'published', 'image', 'likescount', 'dislikescount']
+                        'slug', 'published', 'image', 'likescount', 'dislikescount', 'read_time']
 
 
 class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
@@ -55,7 +55,7 @@ class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
         model = Article
 
         fields = ['title','description', 'body', 'author', 
-                    'created_at', 'updated_at', 'tagList', 'slug', 'published', 'image']
+                    'created_at', 'updated_at', 'tagList', 'slug', 'published', 'image', 'read_time']
 
     def validate_title(self, value):
         if len(value) > 50:
