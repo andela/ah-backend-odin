@@ -13,16 +13,32 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path, re_path, include
+from django.urls import include, path, re_path
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework.permissions import AllowAny
 
-from authors.apps.authentication.views import(
-    password_reset,
-    reset_password,
-    change_passowrd
+from authors.apps.authentication.views import (change_passowrd, password_reset,
+                                               reset_password)
+
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Author's Haven",
+        default_version='v1',
+        description="A Social platform for the creative at heart",
+        terms_of_service="https://authors-haven-odin.herokuapp.com",
+        contact=openapi.Contact(email="odin@gmail.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(AllowAny,),
 )
 
-app_name = "authentication"
+
+app_name = "authentication"	
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,4 +56,7 @@ urlpatterns = [
         include('rest_framework.urls', namespace='rest_framework')
     ),
     path('api/', include('authors.apps.profiles.urls')),
+    
+    path('', schema_view.with_ui('swagger',
+                                         cache_timeout=0), name='schema-swagger-ui'),
 ]
