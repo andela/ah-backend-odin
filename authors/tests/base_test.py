@@ -41,7 +41,24 @@ class BaseTest(TestCase):
                 "published":"True"
             }
         }
+
+        self.report_data = {"report" : 
+                                {
+                                    "reason" : "this is a plagiarized article"
+                                }
+                            }
         
+        self.report_data2 = {"report" : 
+                                {
+                                    "reason" : ""
+                                }
+                            }
+
+        self.report_data3 = {"object" : 
+                                {
+                                    "reason" : "this is a plagized article"
+                                }
+                            }
         
         self.token = dict(self.login_user().data)['token']
         self.headers = {'HTTP_AUTHORIZATION': f'Bearer {self.token}'}
