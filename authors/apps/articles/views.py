@@ -1,60 +1,45 @@
 import uuid
 import json
-
 import jwt
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import NotFound
 from django.template.defaultfilters import slugify
-from rest_framework import generics, status
-from rest_framework.permissions import (
-    IsAuthenticatedOrReadOnly, IsAuthenticated
-)
-from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from django.http import HttpResponse
 from .filters import FilterArticles
 from django.contrib import auth
-
 from .pagination import ArticleLimitOffSetPagination
 from ..authentication.backends import JWTAuthentication
 from ..authentication.models import User
-from .models import Article, BookmarkingArticles
-
-from .renderers import ArticleJSONRenderer
-
-from .models import Article, FavoriteArticle
-from .renderers import ArticleJSONRenderer
-from .serializers import (ArticleDetailSerializer,
-                          CreateArticleAPIViewSerializer,
-                          UpdateArticleAPIVIEWSerializer,
-                          LikeArticleAPIViewSerializer,
-                          FavoriteArticlesSerializer)
-
 from authors.settings import SECRET_KEY
-
 from .models import FavoriteArticle
-
-
 from authors.settings import WPM
 from django.shortcuts import render
-from .models import Article, Rating
-from .serializers import CreateArticleAPIViewSerializer,RatingsSerializer, UpdateArticleAPIVIEWSerializer,ArticleDetailSerializer,ArticleDetailSerializer
-
-from authors.settings import SECRET_KEY
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework import generics, status
+from .models import (Article, 
+                    Comment, 
+                    Thread,
+                    Rating,
+                    FavoriteArticle,
+                    BookmarkingArticles)
+from .serializers import (ArticleDetailSerializer,
+                        CreateArticleAPIViewSerializer,
+                        CreateCommentAPIViewSerializer,
+                        CreateThreadAPIViewSerializer,
+                        UpdateArticleAPIVIEWSerializer,
+                        LikeArticleAPIViewSerializer,
+                        FavoriteArticlesSerializer,
+                        RatingsSerializer)                          
+from rest_framework.exceptions import (PermissionDenied, 
+                                        ValidationError, 
+                                        APIException)
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
+from .renderers import (ArticleJSONRenderer,
+                        CommentJsonRenderer,
+                        ThreadJsonRenderer)
 
-from rest_framework import generics, status
-
-
-
-
-from .serializers import (
-    ArticleDetailSerializer,
-    CreateArticleAPIViewSerializer,
-    UpdateArticleAPIVIEWSerializer
-)
 
 
 class ListCreateArticleAPIView(generics.ListCreateAPIView):
@@ -522,3 +507,74 @@ class RetrieveArticlesWithFavoritesStatus(generics.RetrieveAPIView):
 
 
         return Response({"Articles": article_object}, status=status.HTTP_200_OK)
+class ListCreateCommentsAPIView(generics.CreateAPIView):
+    renderer_classes = (CommentJsonRenderer, )
+    queryset = Comment.objects.all()
+    serializer_class = CreateCommentAPIViewSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+
+    def create(self, request, slug):
+        """This method helps users create comments"""
+        comment = request.data.get('comment', {})
+        try:
+            article = Article.objects.get(slug = slug)
+        except Article.DoesNotExist:
+            return Response({"Error":"Article doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+        serializer = self.serializer_class(data=comment, context={'article': article,'author':request.user})
+        serializer.is_valid(raise_exception=True)
+        serializer.errors
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+      
+
+
+class CommentRetrieveDestroyAPIView(generics.RetrieveDestroyAPIView):  
+    renderer_classes = (CommentJsonRenderer, )
+    queryset = Comment.objects.all()
+    serializer_class = CreateThreadAPIViewSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+
+    def delete(self, request, *args, **kwargs):
+        """This method deletes a comment"""
+        try:
+            comment = Comment.objects.get(id=kwargs['pk'])
+        except:
+            raise APIException({
+                'error': "Comment does not exist"
+            })
+        message = {'Success': f'Comment has been deleted'}
+        comment.delete()
+        return Response(message, status=status.HTTP_200_OK)
+
+
+class ListCreateThreadAPIView(generics.ListCreateAPIView):
+    renderer_classes = (ThreadJsonRenderer, )
+    queryset = Thread.objects.all()
+    serializer_class = CreateThreadAPIViewSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+
+    def create(self, request, slug, pk):
+        """This method creates comment threads"""
+        comment_thread = request.data.get('comment', {})
+        try: 
+            Article.objects.get(slug=slug)
+        except:
+            raise APIException({
+                'error': "Article doesn't exist in the database"
+            })
+
+        try: 
+            comment = Comment.objects.get(id=pk)
+        except:
+            raise APIException({
+                'error': "Comment doesn't exist in the database"
+            })
+
+        author = User.objects.get(email = request.user)
+        serializer = self.serializer_class(data=comment_thread, context={'comment': comment, 'author': author})
+        serializer.is_valid(raise_exception=True)
+        serializer.errors
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

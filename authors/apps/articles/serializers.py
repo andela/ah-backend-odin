@@ -1,17 +1,18 @@
 from rest_framework import serializers
-from taggit_serializer.serializers import (TaggitSerializer,
-                                           TagListSerializerField)
-
-from .models import Article, Rating
-
-
-
-from .models import Article, FavoriteArticle
+from .models import (Article, 
+                    FavoriteArticle, 
+                    Rating)
 from ..authentication.models import User
-from .models import Article, ArticleLikes
-
-
+from .models import (Article, 
+                    ArticleLikes, 
+                    Thread, 
+                    Comment,
+                    FavoriteArticle, 
+                    Rating)
 from rest_framework.validators import UniqueTogetherValidator
+from ..authentication.serializers import UserSerializer
+from taggit_serializer.serializers import (TagListSerializerField,
+                                           TaggitSerializer)
 
 class CreateArticleAPIViewSerializer(TaggitSerializer,serializers.ModelSerializer):
     tagList = TagListSerializerField()
@@ -53,7 +54,7 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
 
         fields = ['title','description', 'body', 'author', 
                     'created_at', 'updated_at', 'tagList', 
-                        'slug', 'published', 'image', 'likescount', 'dislikescount', 'read_time']
+                        'slug', 'published', 'image', 'likescount', 'dislikescount', 'read_time', 'comments']
 
 
 class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
@@ -86,7 +87,7 @@ class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
         article_instance.tagList = validated_data.get('tagList')
         article_instance.save()
         
-        return article_instance      
+        return article_instance 
 
 class RatingsSerializer(serializers.ModelSerializer):
     
@@ -144,3 +145,56 @@ class FavoriteArticlesSerializer(serializers.ModelSerializer):
 
         fields = ('article', 'favorite_status', 'author', 'favorited_at', 'last_updated_at')
         
+        
+        
+
+
+class CreateCommentAPIViewSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
+    class Meta:
+        model = Comment
+        fields = ('id','body','article','createdAt','updatedAt','author', )
+        read_only_fields = ('article', )
+
+    def validate(self, data):
+        comment = data.get('body', None)
+        if len(comment) < 2:
+            raise serializers.ValidationError(
+                "Comment should have atlest 2 characters"
+            )
+        else:
+            return {
+            'body': comment,
+            }
+        
+
+    def create(self, validated_data):  
+        author = self.context["author"]
+        article = self.context["article"]
+        body = validated_data.get('body')        
+        return Comment.objects.create(body=body, author=author, article=article)
+
+
+
+class CreateThreadAPIViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Thread
+        fields = ('id','body','author','comment','createdAt','updatedAt')
+        read_only_fields = ('author', 'comment', )
+
+    def validate(self, data):
+        comment_thread = data.get('body', None)
+        if len(comment_thread) < 2:
+            raise serializers.ValidationError(
+                "Comment should have atlest 2 characters"
+            )
+        else:
+            return {
+            'body': comment_thread,
+            }
+        
+    def create(self, validated_data):  
+        author = self.context["author"]
+        comment = self.context["comment"]
+        body = validated_data.get('body')        
+        return Thread.objects.create(body=body, author=author, comment=comment)
