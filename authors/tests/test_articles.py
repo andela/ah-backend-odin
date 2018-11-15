@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.utils.serializer_helpers import ReturnList
+from rest_framework.utils.serializer_helpers import OrderedDict
 from .base_test import BaseTest
 
 
@@ -13,7 +13,6 @@ class ArticlesTest(BaseTest):
     def test_get_articles(self):
         response = self.get_article()
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(isinstance(response.data, ReturnList))
 
     def test_get_one_article(self):
         response = self.get_one_article()
