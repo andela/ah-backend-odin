@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'rest_framework',
-    
+
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
@@ -48,7 +48,18 @@ INSTALLED_APPS = [
     'taggit',
     'taggit_serializer',
     'authors.apps.reporter',
+    'drf_yasg',
 ]
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -154,7 +165,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles/'
 
 MEDIA_ROOT = "media/"
