@@ -5,6 +5,8 @@ from taggit_serializer.serializers import (TaggitSerializer,
 from .models import Article, Rating
 
 
+
+from .models import Article, FavoriteArticle
 from ..authentication.models import User
 from .models import Article, ArticleLikes
 
@@ -133,3 +135,12 @@ class LikeArticleAPIViewSerializer(serializers.ModelSerializer):
             self.instance.article_like = validated_data["article_like"]
             self.instance.save()
             self.action_performed = "updated"
+
+class FavoriteArticlesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = FavoriteArticle
+
+        fields = ('article', 'favorite_status', 'author', 'favorited_at', 'last_updated_at')
+        

@@ -111,3 +111,18 @@ class TestReadingTime(BaseTest):
         response = self.get_articles_with_their_reading_time()
 
         self.assertEqual(response.status_code, 200)
+
+
+    def test_get_articles_and_their_favorite_status(self):
+        self.create_article_favorite()
+        response = self.get_articles_with_their_favorite_status()
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_articles_and_their_favorite_status(self):
+        response = self.create_article_favorite()
+        self.assertEqual(response.status_code, 201)
+
+    def test_favorite_article(self):
+        self.create_article_favorite()
+        response = self.get_all_articles_with_their_favorite_status()
+        self.assertEqual(response.status_code, 200)

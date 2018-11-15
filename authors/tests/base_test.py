@@ -77,6 +77,11 @@ class BaseTest(TestCase):
 
 
         
+
+        self.favorite_article_data = {
+            "favorite_status": "True"
+        }
+  
         self.report_data2 = {"report" : 
                                 {
                                     "reason" : ""
@@ -158,9 +163,16 @@ class BaseTest(TestCase):
  
     def get_reset_token(self):
         return self.client.get("/api/reset_password/", self.reset_token_data, **self.headers)
-    
 
     def reset_password(self):
         return self.client.post("/api/set_password/complete/", self.password_data, **self.headers)
 
-
+    def get_articles_with_their_favorite_status(self):
+        return self.client.get(f"/api/articles/{self.slug}/favorites/", self.favorite_article_data, **self.headers)
+    
+    def create_article_favorite(self):
+        return self.client.post(f"/api/articles/{self.slug}/favorites/", self.favorite_article_data, **self.headers)
+ 
+    def get_all_articles_with_their_favorite_status(self):
+        return self.client.get(f"/api/articles/favorites/", self.favorite_article_data, **self.headers)
+   
