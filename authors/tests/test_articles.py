@@ -38,3 +38,18 @@ class BookMarkTest(BaseTest):
         response = self.bookmark_article()
         self.assertEqual(response.status_code, 200)
 
+
+class ArticleLikeTests(BaseTest):
+
+    def test_like_article(self):
+        response = self.like_article()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_dislike_article(self):
+        response = self.dislike_article()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_double_like_article(self):
+        response = self.double_like_article()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
