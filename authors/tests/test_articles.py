@@ -31,3 +31,11 @@ class ArticlesTest(BaseTest):
         self.create_article()
         response = self.update_article()
         self.assertEqual(response.status_code, 201)
+
+class BookMarkTest(BaseTest):
+
+
+    def test_bookmark_article(self):
+        response = self.bookmark_article()
+        self.assertEqual(response.status_code, 200)
+

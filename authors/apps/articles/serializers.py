@@ -77,4 +77,4 @@ class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
         article_instance.save()
         
         return article_instance
-        
+
