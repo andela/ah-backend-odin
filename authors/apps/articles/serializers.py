@@ -1,8 +1,10 @@
 from rest_framework import serializers
-from .models import Article
+from taggit_serializer.serializers import (TaggitSerializer,
+                                           TagListSerializerField)
+
 from ..authentication.models import User
-from taggit_serializer.serializers import (TagListSerializerField,
-                                           TaggitSerializer)
+from .models import Article, ArticleLikes
+
 
 class CreateArticleAPIViewSerializer(TaggitSerializer,serializers.ModelSerializer):
     tagList = TagListSerializerField()
@@ -19,8 +21,8 @@ class CreateArticleAPIViewSerializer(TaggitSerializer,serializers.ModelSerialize
     class Meta:
         model = Article
 
-        fields = ['id','title','description', 'body', 'author', 
-                    'created_at', 'updated_at', 'tagList', 'slug', 'published', 'image']
+        fields = ['title','description', 'body', 'author', 
+                    'created_at', 'updated_at', 'tagList', 'slug', 'published', 'image', 'likescount', 'dislikescount']
 
     def validate_title(self, value):
         if len(value) > 50:
@@ -43,7 +45,8 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
         model = Article
 
         fields = ['title','description', 'body', 'author', 
-                    'created_at', 'updated_at', 'tagList', 'slug', 'published', 'image']
+                    'created_at', 'updated_at', 'tagList', 
+                        'slug', 'published', 'image', 'likescount', 'dislikescount']
 
 
 class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
@@ -78,3 +81,31 @@ class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
         
         return article_instance
 
+class LikeArticleAPIViewSerializer(serializers.ModelSerializer):
+
+
+    action_performed = "created"
+
+    class Meta:
+        model = ArticleLikes
+        fields = ['author', 'article', 'article_like']
+
+    def create(self, validated_data):
+
+        try:
+            self.instance = ArticleLikes.objects.filter(author=validated_data["author"].id)[
+                            0:1].get()
+        except ArticleLikes.DoesNotExist:
+            return ArticleLikes.objects.create(**validated_data)
+
+        self.perform_update(validated_data)
+        return self.instance
+
+    def perform_update(self, validated_data):
+        if self.instance.article_like == validated_data["article_like"]:
+            self.instance.delete()
+            self.action_performed = "deleted"
+        else:
+            self.instance.article_like = validated_data["article_like"]
+            self.instance.save()
+            self.action_performed = "updated"

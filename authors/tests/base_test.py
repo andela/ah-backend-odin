@@ -47,6 +47,18 @@ class BaseTest(TestCase):
                                     "reason" : "this is a plagiarized article"
                                 }
                             }
+        self.article_like_data = {
+                "article": {
+		            "article_like":"True"
+	            }
+        }
+
+
+        self.article_dislike_data = {
+                "article": {
+		            "article_like":"True" 
+	            }
+        }
         
         self.report_data2 = {"report" : 
                                 {
@@ -95,4 +107,12 @@ class BaseTest(TestCase):
     
     def bookmark_article(self):
         return self.client.post(f"/api/articles/{self.slug}/bookmark", **self.headers)
+    def like_article(self):
+        return self.client.post(f"/api/articles/{self.slug}/likes", self.article_like_data, **self.headers)
+    
+    def dislike_article(self):
+        return self.client.post(f"/api/articles/{self.slug}/likes", self.article_dislike_data, **self.headers)
+    
+    def double_like_article(self):
+        return self.client.post(f"/api/articles/{self.slug}/likes", self.article_dislike_data, **self.headers)
     

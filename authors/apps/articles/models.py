@@ -20,6 +20,15 @@ class Article(models.Model):
     tagList = TaggableManager(blank=True)
     slug = models.SlugField(max_length=255, unique=True)
     image = models.TextField(null=True, blank=True)
+
+    @property
+    def likescount(self):
+        return ArticleLikes.objects.filter(article_like=True).count()
+
+    @property
+    def dislikescount(self):
+        return ArticleLikes.objects.filter(article_like=False).count()
+
     objects = models.Manager()
 
 class BookmarkingArticles(models.Model):
@@ -27,5 +36,15 @@ class BookmarkingArticles(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article_id = models.ForeignKey(Article, on_delete=models.CASCADE)
     bookmarked_at = models.DateTimeField(auto_now_add=True)
+    objects = models.Manager()
+
+
+class ArticleLikes(models.Model):
+
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, null=True, blank=True, related_name='article_likes')
+    article_like = models.BooleanField(db_index=True, default=None)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    article_liked_at = models.DateTimeField(auto_now_add=True)
+    article_disliked_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
