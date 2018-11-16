@@ -1,4 +1,6 @@
 from . import BaseAPITestCase
+from rest_framework import status
+from .base_test import BaseTest
 
 
 class TestAuthentication(BaseAPITestCase):
@@ -100,3 +102,28 @@ class TestAuthentication(BaseAPITestCase):
     def test_successfull_login_response_has_token(self):
         response = self.login_user_endpoint()
         self.assertIn('token', response.data)
+
+
+class TestResetPassword(BaseTest):
+
+    def test_get_reset_token(self):
+
+        response = self.get_reset_token()
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_send_reset_token_and_link(self):
+        self.create_user()
+        response = self.create_token_and_send_reset_link()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_implement_password_change(self):
+        self.create_user()
+        self.create_token_and_send_reset_link()
+
+        response = self.reset_password()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+

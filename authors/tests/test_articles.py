@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.utils.serializer_helpers import ReturnList
+from rest_framework.utils.serializer_helpers import OrderedDict
 from .base_test import BaseTest
 
 
@@ -13,7 +13,6 @@ class ArticlesTest(BaseTest):
     def test_get_articles(self):
         response = self.get_article()
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(isinstance(response.data, ReturnList))
 
     def test_get_one_article(self):
         response = self.get_one_article()
@@ -31,3 +30,99 @@ class ArticlesTest(BaseTest):
         self.create_article()
         response = self.update_article()
         self.assertEqual(response.status_code, 201)
+
+class BookMarkTest(BaseTest):
+
+
+    def test_bookmark_article(self):
+        response = self.bookmark_article()
+        self.assertEqual(response.status_code, 200)
+
+
+class ArticleLikeTests(BaseTest):
+
+    def test_like_article(self):
+        response = self.like_article()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_dislike_article(self):
+        response = self.dislike_article()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_double_like_article(self):
+        response = self.double_like_article()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+class TestRating(BaseTest):
+
+    def test_post_user_cannot_rate_his_own_article(self):
+
+        self.create_article()
+
+        response = self.create_rating()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_get_one_article_rating(self):
+
+        self.create_article()
+
+        response = self.get_one_article_rating()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_all_articles_and_their_ratings(self):
+
+        self.create_article()
+
+        response = self.get_articles_and_their_ratings()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class TestReadingTime(BaseTest):
+
+    def test_articles_return_reading_time(self):
+
+        self.create_article()
+
+        self.create_article()
+
+        self.create_article()
+
+        response = self.get_articles_with_reading_time()
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_article_return_reading_time(self):
+
+        self.create_article()
+
+        response = self.get_article_with_reading_time()
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_all_articles_return_reading_time(self):
+
+        self.create_article()
+
+        self.create_article()
+
+        response = self.get_articles_with_their_reading_time()
+
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_get_articles_and_their_favorite_status(self):
+        self.create_article_favorite()
+        response = self.get_articles_with_their_favorite_status()
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_articles_and_their_favorite_status(self):
+        response = self.create_article_favorite()
+        self.assertEqual(response.status_code, 201)
+
+    def test_favorite_article(self):
+        self.create_article_favorite()
+        response = self.get_all_articles_with_their_favorite_status()
+        self.assertEqual(response.status_code, 200)
