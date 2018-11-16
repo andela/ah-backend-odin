@@ -39,20 +39,34 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'rest_framework',
-    
+
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
     'authors.apps.PasswordResetToken',
     'authors.apps.articles',
+    'authors.apps.follower',
     'taggit',
     'taggit_serializer',
+    'authors.apps.reporter',
+    'drf_yasg',
+    'django_nose',
 ]
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,6 +112,16 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'dfih7qse7emgdp',
+#         'USER': 'podujiopgnrgup',
+#         'PASSWORD': '7ab4152f4dc0b634c49b7054c2514974bd28b46848882a448d96a9658ba8fdff',
+#         'HOST': 'ec2-184-73-222-192.compute-1.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
 
 # Local Postgres Database Config
 # DATABASES = {
@@ -142,7 +166,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Kampala'
 
 USE_I18N = True
 
@@ -153,7 +177,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles/'
 
 MEDIA_ROOT = "media/"
@@ -196,6 +220,23 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
 
+
 BASE_URL = 'http://127.0.0.1:8000'
 
 TAGGIT_CASE_INSENSITIVE = True
+
+WPM = 200
+NOSE_ARGS = [ 
+    '--with-coverage',
+    '--cover-package=authors',
+    '--cover-tests',
+]
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+
+TAGGIT_CASE_INSENSITIVE = True
+
+
+BASE_URL = 'http://127.0.0.1:8000'
+

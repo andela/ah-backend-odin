@@ -1,3 +1,4 @@
+
 <h1 align="center">Authors Haven (Backend)</h1>
 
 [![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-odin/badge.svg)](https://coveralls.io/github/andela/ah-backend-odin)
@@ -78,6 +79,7 @@ export DB_NAME=authors_haven
 The application migrations files are not pushed to github so you will have to generate them on your own.
 
 After you have succeeded with the database setup, run the following commands
+
 
 ```bash
 # Create the migrations from the applications models
