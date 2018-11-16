@@ -122,3 +122,6 @@ class BaseTest(TestCase):
     def get_article_with_reading_time(self):
         return self.client.get(f"/api/articles/{self.slug}/readings/", self.article_data, **self.headers)
     
+    def get_articles_with_their_reading_time(self):
+        return self.client.get("/api/articles/", self.article_data, **self.headers)
+    
