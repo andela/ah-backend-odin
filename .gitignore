@@ -95,8 +95,3 @@ ENV/
 # SQLite3
 db.sqlite3
 .bash_profile
-authors/apps/articles/migrations/0001_initial.py
-authors/apps/articles/migrations/0001_initial.py
-authors/apps/authentication/migrations/0001_initial.py
-authors/apps/PasswordResetToken/migrations/0001_initial.py
-authors/apps/PasswordResetToken/migrations/0001_initial.py

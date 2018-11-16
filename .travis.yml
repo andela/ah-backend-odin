@@ -12,7 +12,6 @@ before_script:
   - pip install -r requirements.txt
   - pip install coveralls
   - psql -c 'create database authors;' -U postgres
-  - python manage.py makemigrations  reporter --noinput
   - python manage.py makemigrations --noinput
   - python manage.py migrate --noinput
 

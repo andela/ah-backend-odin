@@ -2,7 +2,4 @@
 omit =
     # omit anything in a migrations directory
     */migrations/*
-    */apps.py
     */wsgi.py
-
-

@@ -43,8 +43,6 @@ INSTALLED_APPS = [
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
-    'authors.apps.reporter',
-    'authors.apps.follower',
 ]
 
 MIDDLEWARE = [

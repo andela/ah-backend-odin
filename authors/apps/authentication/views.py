@@ -3,7 +3,6 @@ from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics
 
 import re
 
@@ -34,7 +33,7 @@ from django.utils.timezone import now
 import uuid
 
 
-class RegistrationAPIView(generics.CreateAPIView):
+class RegistrationAPIView(APIView):
     # Allow any user (authenticated or not) to hit this endpoint.
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
@@ -53,7 +52,7 @@ class RegistrationAPIView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class ActivationAPIView(generics.CreateAPIView):
+class ActivationAPIView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, uidb64, token):
@@ -75,7 +74,7 @@ class ActivationAPIView(generics.CreateAPIView):
             return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_408_REQUEST_TIMEOUT)
 
 
-class LoginAPIView(generics.CreateAPIView):
+class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
@@ -93,7 +92,7 @@ class LoginAPIView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UserRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
@@ -147,12 +146,13 @@ def password_reset(request):
         )
 
         return Response({"message": "email sent", "data": request.data})
+    return Response({"message": "Great Work, TeamOdin"})
 
 
 @api_view(['GET'])
 def reset_password(request):
-    token = request.POST.get('token')
 
+    token = request.GET['token'].strip()
     token = get_object_or_404(Token, token=token)
 
     time_created = token.created_at
@@ -178,15 +178,11 @@ def reset_password(request):
 def change_passowrd(request):
     if request.method == 'POST':
         data = {}
-
-        email = request.data.get('email')
-        
+        email = request.POST['email']
         user = User.objects.get(email=email)
 
         if user:
-            password = request.data.get('password')
-
-
+            password = request.POST['password'].strip()
             if validate_password(password) == True:
                 user.set_password(password)
                 user.save()
