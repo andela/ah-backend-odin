@@ -65,7 +65,7 @@ class TestReadingTime(BaseTest):
 
         response = self.get_articles_with_reading_time()
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
 
     def test_article_return_reading_time(self):
 
@@ -75,7 +75,7 @@ class TestReadingTime(BaseTest):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_articles_return_reading_time(self):
+    def test_all_articles_return_reading_time(self):
 
         self.create_article()
 
