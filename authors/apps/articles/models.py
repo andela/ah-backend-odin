@@ -20,6 +20,7 @@ class Article(models.Model):
     tagList = TaggableManager(blank=True)
     slug = models.SlugField(max_length=255, unique=True)
     image = models.TextField(null=True, blank=True)
+    read_time = models.TextField(max_length = 200, default="Unknown")
 
     @property
     def likescount(self):

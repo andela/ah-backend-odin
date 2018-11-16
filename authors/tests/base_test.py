@@ -115,4 +115,13 @@ class BaseTest(TestCase):
     
     def double_like_article(self):
         return self.client.post(f"/api/articles/{self.slug}/likes", self.article_dislike_data, **self.headers)
+  
+    def get_articles_with_reading_time(self):
+        return self.client.get("/api/articles/readings/", self.article_data, **self.headers)
+  
+    def get_article_with_reading_time(self):
+        return self.client.get(f"/api/articles/{self.slug}/readings/", self.article_data, **self.headers)
+    
+    def get_articles_with_their_reading_time(self):
+        return self.client.get("/api/articles/", self.article_data, **self.headers)
     

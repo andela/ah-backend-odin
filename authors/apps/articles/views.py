@@ -25,6 +25,8 @@ from .serializers import (ArticleDetailSerializer,
                           UpdateArticleAPIVIEWSerializer,
                           LikeArticleAPIViewSerializer)
 
+
+from authors.settings import WPM
 class ListCreateArticleAPIView(generics.ListCreateAPIView):
 
     renderer_classes = (ArticleJSONRenderer, )
@@ -44,6 +46,25 @@ class ListCreateArticleAPIView(generics.ListCreateAPIView):
         slug = slugify(article["title"]).replace("_", "-")
         slug = slug + "-" + str(uuid.uuid4()).split("-")[-1]
         article["slug"] = slug
+
+        the_full_sentence = "{} {}".format(article['title'], article['body'])
+
+        words = the_full_sentence.split()
+
+        number_of_words = len(words)
+
+        minutes = round(number_of_words/WPM,0)
+
+        if int(minutes) < 1:
+
+            message = "Less than a minute"
+
+        else:
+
+            message = str(minutes)+ " Minutes"
+
+        
+        article['read_time'] = message
 
         serializer = self.serializer_class(data=article)
         serializer.is_valid(raise_exception=True)
@@ -69,6 +90,26 @@ class UpdateDestroyArticleAPIView(generics.RetrieveUpdateDestroyAPIView):
         slug = slugify(article["title"]).replace("_", "-")
         slug = slug + "-" + str(uuid.uuid4()).split("-")[-1]
         article["slug"] = slug
+
+        the_full_sentence = "{} {}".format(article['title'], article['body'])
+
+        words = the_full_sentence.split()
+
+        number_of_words = len(words)
+
+        minutes = round(number_of_words/WPM,0)
+
+        if int(minutes) < 1:
+
+            message = "Less than a minute"
+
+        else:
+
+            message = str(minutes)+ " Minutes"
+
+        
+        article["read_time"] = message
+
 
         token = request.META.get('HTTP_AUTHORIZATION', ' ').split(' ')[1]
         payload = jwt.decode(token, settings.SECRET_KEY, 'utf-8')

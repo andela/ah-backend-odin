@@ -53,3 +53,34 @@ class ArticleLikeTests(BaseTest):
         response = self.double_like_article()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+class TestReadingTime(BaseTest):
+
+    def test_articles_return_reading_time(self):
+
+        self.create_article()
+
+        self.create_article()
+
+        self.create_article()
+
+        response = self.get_articles_with_reading_time()
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_article_return_reading_time(self):
+
+        self.create_article()
+
+        response = self.get_article_with_reading_time()
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_all_articles_return_reading_time(self):
+
+        self.create_article()
+
+        self.create_article()
+
+        response = self.get_articles_with_their_reading_time()
+
+        self.assertEqual(response.status_code, 200)
