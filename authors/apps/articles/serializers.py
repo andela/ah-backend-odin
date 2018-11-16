@@ -2,9 +2,14 @@ from rest_framework import serializers
 from taggit_serializer.serializers import (TaggitSerializer,
                                            TagListSerializerField)
 
+from .models import Article, Rating
+
+
 from ..authentication.models import User
 from .models import Article, ArticleLikes
 
+
+from rest_framework.validators import UniqueTogetherValidator
 
 class CreateArticleAPIViewSerializer(TaggitSerializer,serializers.ModelSerializer):
     tagList = TagListSerializerField()
@@ -79,7 +84,26 @@ class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
         article_instance.tagList = validated_data.get('tagList')
         article_instance.save()
         
-        return article_instance
+        return article_instance      
+
+class RatingsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+
+        model = Rating
+
+        fields = ['id', 'article', 'article_rate', 'author']
+
+        validators = [UniqueTogetherValidator(
+
+            queryset=Rating.objects.all(),
+
+            fields=('article', 'author',),
+
+            message = ("You cannot rate this article more than once")
+
+        )]
+
 
 class LikeArticleAPIViewSerializer(serializers.ModelSerializer):
 

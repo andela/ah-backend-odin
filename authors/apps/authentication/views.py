@@ -147,13 +147,12 @@ def password_reset(request):
         )
 
         return Response({"message": "email sent", "data": request.data})
-    return Response({"message": "Great Work, TeamOdin"})
 
 
 @api_view(['GET'])
 def reset_password(request):
+    token = request.POST.get('token')
 
-    token = request.GET['token'].strip()
     token = get_object_or_404(Token, token=token)
 
     time_created = token.created_at
@@ -179,11 +178,15 @@ def reset_password(request):
 def change_passowrd(request):
     if request.method == 'POST':
         data = {}
-        email = request.POST['email']
+
+        email = request.data.get('email')
+        
         user = User.objects.get(email=email)
 
         if user:
-            password = request.POST['password'].strip()
+            password = request.data.get('password')
+
+
             if validate_password(password) == True:
                 user.set_password(password)
                 user.save()
