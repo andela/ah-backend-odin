@@ -76,6 +76,17 @@ class BaseTest(TestCase):
         }
 
 
+        self.comment_data = {
+            "comment": {
+                "body": "Please include your location"
+            }
+        }
+
+        self.thread_data = {
+            "comment": {
+                "body": "Excellent work"
+            }
+        }             
         
 
         self.favorite_article_data = {
@@ -97,6 +108,8 @@ class BaseTest(TestCase):
         self.token = dict(self.login_user().data)['token']
         self.headers = {'HTTP_AUTHORIZATION': f'Bearer {self.token}'}
         self.slug = dict(self.create_article().data)['slug']
+        self.wrong_slug = "how-to-train-your-dragnnon-b78a31fea59f19"
+        self.comment_pk = dict(self.create_comment().data)['id']
         
 
 
@@ -176,3 +189,22 @@ class BaseTest(TestCase):
     def get_all_articles_with_their_favorite_status(self):
         return self.client.get(f"/api/articles/favorites/", self.favorite_article_data, **self.headers)
    
+    def create_comment(self):
+        return self.client.post(f"/api/articles/{self.slug}/comments",
+        self.comment_data, **self.headers)
+
+    def get_a_comment(self):
+        return self.client.get(f"/api/articles/{self.slug}/comments", 
+        self.comment_data, **self.headers)
+
+    def delete_comment(self):
+        return self.client.delete(f"/api/articles/{self.slug}/comments/{self.comment_pk}",
+        self.comment_data, **self.headers)    
+    
+    def create_thread(self):
+        return self.client.post(f"/api/articles/{self.slug}/comments/{self.comment_pk}/threads", 
+        self.thread_data, **self.headers)
+
+    def comment_on_non_existing_article(self):
+        return self.client.post(f"/api/articles/{self.wrong_slug}/comments", 
+        self.comment_data, **self.headers)  

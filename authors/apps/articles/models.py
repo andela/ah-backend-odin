@@ -32,6 +32,11 @@ class Article(models.Model):
 
 
     objects = models.Manager()
+    
+    @property
+    def comments(self):
+        comments = Comment.objects.filter(article=self.id).values()
+        return [ dict(comment) for comment in comments]
 
 
 class BookmarkingArticles(models.Model):
@@ -50,6 +55,7 @@ class ArticleLikes(models.Model):
     article_liked_at = models.DateTimeField(auto_now_add=True)
     article_disliked_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+    
 class Rating(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     article_rate = models.IntegerField()
@@ -67,3 +73,19 @@ class FavoriteArticle(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     favorited_at = models.DateTimeField(auto_now_add=True)
     last_updated_at = models.DateTimeField(auto_now=True)
+
+class Comment(models.Model):
+    body = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
+
+class Thread(models.Model):
+    body = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
+    
+

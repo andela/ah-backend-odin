@@ -20,9 +20,12 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
 
-from authors.apps.authentication.views import (change_passowrd, password_reset,
+from authors.apps.authentication.views import(
+    password_reset,
+    reset_password,
+    change_passowrd
+)
 
-                                               reset_password,)
 schema_view = get_schema_view(
     openapi.Info(
         title="Author's Haven",
@@ -35,6 +38,7 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(AllowAny,),
 )
+
 
 
 app_name = "authentication"	

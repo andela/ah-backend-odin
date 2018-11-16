@@ -4,10 +4,14 @@ from .views import (
     UpdateDestroyArticleAPIView,
     BookMarkArticleAPIView,
     LikeArticleAPIView, 
-    CreateRatings, RetrieveRatings, 
+    CreateRatings, 
+    RetrieveRatings, 
     RetrieveAllArticlesWithRatings,
     FavoriteArticles,
     RetrieveArticlesWithFavoritesStatus,
+    ListCreateCommentsAPIView,
+    CommentRetrieveDestroyAPIView,
+    ListCreateThreadAPIView
 )
 
 urlpatterns = [
@@ -21,4 +25,10 @@ urlpatterns = [
     path('<slug>/likes', LikeArticleAPIView.as_view(), ),
     path('<slug>/favorites/', FavoriteArticles.as_view(), ),
     path('favorites/', RetrieveArticlesWithFavoritesStatus.as_view(), ),
+    path('<str:slug>/comments', 
+        ListCreateCommentsAPIView.as_view()),
+    path('<str:slug>/comments/<int:pk>', 
+        CommentRetrieveDestroyAPIView.as_view()),
+    path('<str:slug>/comments/<int:pk>/threads',
+        ListCreateThreadAPIView.as_view()),        
 ]
