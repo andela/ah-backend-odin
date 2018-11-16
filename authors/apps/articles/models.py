@@ -30,7 +30,9 @@ class Article(models.Model):
     def dislikescount(self):
         return ArticleLikes.objects.filter(article_like=False).count()
 
+
     objects = models.Manager()
+
 
 class BookmarkingArticles(models.Model):
  
@@ -56,3 +58,12 @@ class Rating(models.Model):
     updated_at = models.DateField(auto_now=True)
 
 
+
+
+
+class FavoriteArticle(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    favorite_status = models.BooleanField(default=False)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    favorited_at = models.DateTimeField(auto_now_add=True)
+    last_updated_at = models.DateTimeField(auto_now=True)

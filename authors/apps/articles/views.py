@@ -21,10 +21,18 @@ from ..authentication.models import User
 from .models import Article, BookmarkingArticles
 
 from .renderers import ArticleJSONRenderer
+
+from .models import Article, FavoriteArticle
+from .renderers import ArticleJSONRenderer
 from .serializers import (ArticleDetailSerializer,
                           CreateArticleAPIViewSerializer,
                           UpdateArticleAPIVIEWSerializer,
-                          LikeArticleAPIViewSerializer)
+                          LikeArticleAPIViewSerializer,
+                          FavoriteArticlesSerializer)
+
+from authors.settings import SECRET_KEY
+
+from .models import FavoriteArticle
 
 
 from authors.settings import WPM
@@ -409,3 +417,108 @@ class RetrieveAllArticlesWithRatings(generics.RetrieveAPIView):
             
         return Response({"Article":body}, status=status.HTTP_200_OK)
 
+
+
+class FavoriteArticles(generics.ListCreateAPIView):
+
+    queryset = FavoriteArticle.objects.all()
+
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    serializer_class = FavoriteArticlesSerializer
+
+    lookup_url_kwarg = 'slug'
+
+    def post(self, request, *args, **kwargs):
+
+        slug = self.kwargs.get(self.lookup_url_kwarg)
+
+        article_instance = Article.objects.get(slug=slug)
+
+        article_id = article_instance.id
+
+        article_favorite = request.data.get('favorite_status')
+
+        user_instance = request.user
+
+        user_id = user_instance.id
+
+        favoriting_body = {
+
+            "article": article_id,
+
+            "favorite_status": article_favorite,
+
+            "author": user_id
+        }
+
+        serializer = self.serializer_class(data=favoriting_body)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+
+        data = serializer.data
+        
+        data["message"] = "You Have Successfully Added This Article To Your Favorites"
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class RetrieveArticlesWithFavoritesStatus(generics.RetrieveAPIView):
+
+    serializer_class = FavoriteArticlesSerializer
+
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+
+        queryset = Article.objects.all()
+
+        return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+
+        articles = self.get_queryset()
+
+        article_object = []
+
+        title = {}
+
+        desc = {}
+
+        body = {}
+
+        favorite = {}
+
+        user_instance = request.user
+
+        user_id = user_instance.id
+
+        for article in articles:
+
+            title['title'] = article.title
+
+            desc['description'] = article.description
+
+            body['body'] = article.body
+
+            favorite_object = FavoriteArticle.objects.filter(article_id=article.id, author=user_id).exists()
+
+            if favorite_object:
+                
+                favorite_object_instance = FavoriteArticle.objects.get(article_id=article.id, author=user_id)
+
+                favorite_status = favorite_object_instance.favorite_status
+
+                favorite['my_favorite'] = favorite_status
+
+            else:
+
+                favorite['my_favorite'] = False
+
+            combined_json = {**title, **desc, **body, **favorite}
+
+            article_object.append(combined_json)
+
+
+        return Response({"Articles": article_object}, status=status.HTTP_200_OK)

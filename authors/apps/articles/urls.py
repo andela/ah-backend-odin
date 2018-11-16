@@ -5,8 +5,9 @@ from .views import (
     BookMarkArticleAPIView,
     LikeArticleAPIView, 
     CreateRatings, RetrieveRatings, 
-    RetrieveAllArticlesWithRatings
-
+    RetrieveAllArticlesWithRatings,
+    FavoriteArticles,
+    RetrieveArticlesWithFavoritesStatus,
 )
 
 urlpatterns = [
@@ -17,5 +18,7 @@ urlpatterns = [
     path('<slug>/ratings/', CreateRatings.as_view()),
     path('<slug>/viewratings/', RetrieveRatings.as_view() ),
     path('ratings/', RetrieveAllArticlesWithRatings.as_view() ),
-
+    path('<slug>/likes', LikeArticleAPIView.as_view(), ),
+    path('<slug>/favorites/', FavoriteArticles.as_view(), ),
+    path('favorites/', RetrieveArticlesWithFavoritesStatus.as_view(), ),
 ]
