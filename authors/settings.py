@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'taggit_serializer',
     'authors.apps.reporter',
     'drf_yasg',
+    'django_nose',
 ]
 
 SWAGGER_SETTINGS = {
@@ -64,7 +65,7 @@ SWAGGER_SETTINGS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -110,6 +111,16 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'dfih7qse7emgdp',
+#         'USER': 'podujiopgnrgup',
+#         'PASSWORD': '7ab4152f4dc0b634c49b7054c2514974bd28b46848882a448d96a9658ba8fdff',
+#         'HOST': 'ec2-184-73-222-192.compute-1.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
 
 # Local Postgres Database Config
 # DATABASES = {
@@ -208,8 +219,23 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
 
+
 BASE_URL = 'http://127.0.0.1:8000'
 
 TAGGIT_CASE_INSENSITIVE = True
 
 WPM = 200
+NOSE_ARGS = [ 
+    '--with-coverage',
+    '--cover-package=authors',
+    '--cover-tests',
+]
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+
+TAGGIT_CASE_INSENSITIVE = True
+
+
+BASE_URL = 'http://127.0.0.1:8000'
+

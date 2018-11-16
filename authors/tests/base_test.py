@@ -59,6 +59,23 @@ class BaseTest(TestCase):
 		            "article_like":"True" 
 	            }
         }
+
+        self.article_rating_data = {
+            "article_rate": "4"
+        }
+
+        self.reset_token_data = {
+
+            "email": "johndoe@example.com"
+        }
+
+        self.password_data = {
+
+            "email": "johndoe@example.com",
+            "password": "NewPassword123!"
+        }
+
+
         
         self.report_data2 = {"report" : 
                                 {
@@ -91,6 +108,7 @@ class BaseTest(TestCase):
         return self.client.post("/api/users/login/", self.user_data2)
 
     def create_article(self):
+        self.create_user()
         return self.client.post("/api/articles/", self.article_data, **self.headers)
     
     def get_article(self):
@@ -125,3 +143,24 @@ class BaseTest(TestCase):
     def get_articles_with_their_reading_time(self):
         return self.client.get("/api/articles/", self.article_data, **self.headers)
     
+
+    def create_rating(self):
+        return self.client.post(f"/api/articles/{self.slug}/ratings/",self.article_rating_data, **self.headers)
+
+    def get_one_article_rating(self):
+        return self.client.get(f"/api/articles/{self.slug}/viewratings/", self.article_rating_data, **self.headers)
+
+    def get_articles_and_their_ratings(self):
+        return self.client.get(f"/api/articles/ratings/", self.article_rating_data, **self.headers)
+    
+    def create_token_and_send_reset_link(self):
+        return self.client.post("/api/password_reset/", self.reset_token_data, **self.headers)
+ 
+    def get_reset_token(self):
+        return self.client.get("/api/reset_password/", self.reset_token_data, **self.headers)
+    
+
+    def reset_password(self):
+        return self.client.post("/api/set_password/complete/", self.password_data, **self.headers)
+
+

@@ -6,10 +6,10 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import slugify
 from rest_framework import generics, status
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly, IsAuthenticated
 )
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from django.http import HttpResponse
 from .filters import FilterArticles
@@ -19,6 +19,7 @@ from .pagination import ArticleLimitOffSetPagination
 from ..authentication.backends import JWTAuthentication
 from ..authentication.models import User
 from .models import Article, BookmarkingArticles
+
 from .renderers import ArticleJSONRenderer
 from .serializers import (ArticleDetailSerializer,
                           CreateArticleAPIViewSerializer,
@@ -27,6 +28,27 @@ from .serializers import (ArticleDetailSerializer,
 
 
 from authors.settings import WPM
+from django.shortcuts import render
+from .models import Article, Rating
+from .serializers import CreateArticleAPIViewSerializer,RatingsSerializer, UpdateArticleAPIVIEWSerializer,ArticleDetailSerializer,ArticleDetailSerializer
+
+from authors.settings import SECRET_KEY
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+
+from rest_framework import generics, status
+
+
+
+
+from .serializers import (
+    ArticleDetailSerializer,
+    CreateArticleAPIViewSerializer,
+    UpdateArticleAPIVIEWSerializer
+)
+
+
 class ListCreateArticleAPIView(generics.ListCreateAPIView):
 
     renderer_classes = (ArticleJSONRenderer, )
@@ -205,4 +227,185 @@ class LikeArticleAPIView(generics.ListCreateAPIView):
         else:
             action_status = status.HTTP_201_CREATED
         return Response(serializer.data, status=action_status)
+class CreateRatings(generics.CreateAPIView):
+
+    serializer_class = RatingsSerializer
+
+    lookup_url_kwarg = 'slug'
+
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def post(self, request, *args, **kwargs):
+
+        slug = self.kwargs.get(self.lookup_url_kwarg)
+
+        article_instance = Article.objects.get(slug=slug)
+
+        article_id = article_instance.id
+
+        article_author = article_instance.author_id
+
+        article_rate = request.data.get('article_rate')
+
+        if not article_rate:
+
+            return Response({"Message": "You must provide a rating for this article"}, status=status.HTTP_400_BAD_REQUEST)
+        if int(article_rate) >5 or int(article_rate) < 1:
+
+            return Response({"Message": "You must provide a rating between 1 and 5"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_instance = request.user
+
+        username = user_instance.username
+
+        user_instance = User.objects.get(username=username)
+
+        user_id = user_instance.id
+
+
+        rating_body = {
+
+            "article": article_id,
+
+            "article_rate": article_rate,
+
+            "author": user_id
+        }
+
+        if article_author == user_id:
+
+            return Response({"message": "You cannot rate your own article"}, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            serializer = self.serializer_class(data=rating_body)
+
+            serializer.is_valid(raise_exception=True)
+
+            serializer.save()
+
+            data = serializer.data
+            
+            data["message"] = "You Have Successfully Rated This Article"
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class RetrieveRatings(generics.RetrieveAPIView):
+
+    lookup_url_kwarg = 'slug'
+    
+    serializer_class = RatingsSerializer
+
+    def get_queryset(self, *args, **kwargs):
+
+        slug = self.kwargs.get(self.lookup_url_kwarg)
+
+        article_instance = Article.objects.get(slug=slug)
+
+        article_id = article_instance.id
+
+        article_ratings = Rating.objects.filter(article=article_id)
+        
+        return article_ratings
+
+    def retrieve(self, *args, **kwargs):
+
+        article_ratings = self.get_queryset()
+
+        body = []
+
+        article_title = {}
+
+        article_rate = {}
+
+        total_rates = 0
+
+        ratings_count = article_ratings.count()
+
+        for each_rate in article_ratings:
+
+            title = Article.objects.get(id=each_rate.article_id)
+
+            article_title['title'] = title.title
+
+            total_rates = total_rates + each_rate.article_rate
+
+        if ratings_count >0:
+
+            average = round(total_rates/ratings_count,1)
+            
+            article_rate['rating'] = average
+
+            combined_dict = {**article_title, **article_rate}
+
+            body.append(combined_dict)
+
+        return Response({"Article":body}, status=status.HTTP_200_OK)
+
+class RetrieveAllArticlesWithRatings(generics.RetrieveAPIView):
+    serializer_class = RatingsSerializer
+
+    def get_queryset(self):
+
+        article_instance = Article.objects.all()
+
+        return article_instance
+
+    def retrieve(self, *args, **kwargs):
+
+        articles = self.get_queryset()
+
+        body = []
+
+        article_title = {}
+
+        article_rate = {}
+
+        for each_article in articles:
+
+            article_id = each_article.id
+
+            article_ratings = Rating.objects.filter(article=article_id)
+
+            if article_ratings:
+
+                total_rates = 0
+
+                ratings_count = article_ratings.count()
+                
+                for each_rate in article_ratings:
+
+                    article_instance = Article.objects.get(id=article_id)
+
+                    article_title['title'] = article_instance.title
+
+                    total_rates = total_rates + each_rate.article_rate
+
+                if ratings_count >0:
+
+                    average = round(total_rates/ratings_count,1)
+                
+                    article_rate['rating'] = average
+
+                    combined_dict = {**article_title, **article_rate}
+
+                    body.append(combined_dict)
+
+            else:
+
+                article_instance = Article.objects.get(id=article_id)
+
+                article_title['title'] = article_instance.title  
+
+                average = "Unknown"
+                
+                article_rate['rating'] = average
+
+                combined_dict = {**article_title, **article_rate}
+
+                print(combined_dict)
+
+                body.append(combined_dict)
+            
+        return Response({"Article":body}, status=status.HTTP_200_OK)
 

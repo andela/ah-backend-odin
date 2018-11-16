@@ -48,4 +48,11 @@ class ArticleLikes(models.Model):
     article_liked_at = models.DateTimeField(auto_now_add=True)
     article_disliked_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+class Rating(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    article_rate = models.IntegerField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    rated_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
+
 
