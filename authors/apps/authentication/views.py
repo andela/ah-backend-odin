@@ -1,20 +1,32 @@
+from django.contrib.auth import get_user_model
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
+from .models import User
+from rest_framework.generics import (RetrieveUpdateAPIView,
+                                    ListAPIView, 
+                                    CreateAPIView)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics
 
+from social_django.utils import load_backend, load_strategy
+from social.backends.oauth import BaseOAuth1, BaseOAuth2
+from social.exceptions import AuthAlreadyAssociated
+from rest_framework.views import APIView
+from social_core.exceptions import MissingBackend
+import facebook
 import re
+import urllib.request
+import json
 
-from .models import User
 
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer,
     RegistrationSerializer,
     UserSerializer,
-    UserWithProfileSerializer
+    UserWithProfileSerializer,
+    SocialAuthenticationSerializer
 )
 
 
@@ -43,7 +55,7 @@ class RegistrationAPIView(generics.CreateAPIView):
     def post(self, request):
         user = request.data.get('user', {})
 
-        # The create serializer, validate serializer, save serializer pattern
+        #The create serializer, validate serializer, save serializer pattern
         # below is common and you will see it a lot throughout this course and
         # your own work later on. Get familiar with it.
         serializer = self.serializer_class(data=user)
@@ -206,3 +218,98 @@ class ListUserWithProfiles(ListAPIView):
     queryset = User.objects.all().prefetch_related("profile")
     permission_classes = (IsAuthenticated,)
     serializer_class = UserWithProfileSerializer
+
+
+class FacebookAPIView(CreateAPIView):
+    """
+    Allows social sign using Facebook
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = SocialAuthenticationSerializer
+    renderer_classes = (UserJSONRenderer,)
+    def create(self, request, *args, **kwargs):
+        
+        serializer = self.serializer_class(data=request.data['user'])
+        
+        serializer.is_valid(raise_exception=True)
+        access_token = serializer.data.get('access_token')
+        
+        try:
+            #we obtain details of the user from the access token
+            graph = facebook.GraphAPI(access_token=access_token)
+            user_info = graph.get_object(
+                id='me',
+                fields='first_name, middle_name, last_name, id, email') 
+        except facebook.GraphAPIError as e:
+            return Response({"error": e.message}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+        try:
+            #we just authenticate the user if there email exits in the database
+            user = User.objects.get(email=user_info.get('email'))
+            return Response({
+                'email': user.email,
+                'username': user.username,
+                'token': user.token
+            }, status=status.HTTP_200_OK) 
+        except User.DoesNotExist:
+            #we create the user if there email doesn't exist in the database
+            password = User.objects.make_random_password()
+            user = User(
+                username = user_info.get('first_name'),
+                email = user_info.get('email'),
+                is_active = 1,
+            )
+            user.set_password(password)
+            user.save()
+            return Response({
+                'email': user.email,
+                'username': user.username,
+                'token': user.token
+            }, status=status.HTTP_200_OK)                      
+
+
+
+
+class GoogleAPIView(CreateAPIView):
+    """
+    Allows social sign using Facebook
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = SocialAuthenticationSerializer
+    renderer_classes = (UserJSONRenderer,)
+    def create(self, request, *args, **kwargs):
+
+        access_token=request.data.get('user').get('access_token')
+        try:
+            results = urllib.request.urlopen(f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}").read()
+            user_details = json.loads(results.decode())
+        except:
+            return Response({"Error": "Wrong Token Supplied"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        try:
+            #we just authenticate the user if there email exits in the database
+            user = User.objects.get(email=user_details.get('email'))
+            return Response({
+                'email': user.email,
+                'username': user.username,
+                'token': user.token
+            }, status=status.HTTP_200_OK) 
+        except User.DoesNotExist:
+            #we create the user if there email doesn't exist in the database
+            password = User.objects.make_random_password()
+            user = User(
+                username = user_details.get('name'),
+                email = user_details.get('email'),
+                is_active = 1
+            )
+            user.set_password(password)
+            user.save()
+            return Response({
+                'email': user.email,
+                'username': user.username,
+                'token': user.token
+            }, status=status.HTTP_200_OK)          
+
+

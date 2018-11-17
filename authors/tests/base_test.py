@@ -1,6 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 import json
+import os
 
 
 class BaseTest(TestCase):
@@ -87,6 +88,17 @@ class BaseTest(TestCase):
                 "body": "Excellent work"
             }
         }             
+        self.google_social_login = {
+            "user":{
+                "access_token" : os.environ.get("GOOGLE_ACCESS_TOKEN", None)
+            }
+        }
+
+        self.facebook_social_login = {
+            "user":{
+                "access_token": os.environ.get("FACEBOOK_ACCESS_TOKEN", None)
+            }   
+        }        
         
 
         self.favorite_article_data = {
@@ -208,3 +220,6 @@ class BaseTest(TestCase):
     def comment_on_non_existing_article(self):
         return self.client.post(f"/api/articles/{self.wrong_slug}/comments", 
         self.comment_data, **self.headers)  
+
+
+
