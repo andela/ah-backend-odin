@@ -13,6 +13,11 @@ class TestReporter(BaseTest):
         response = self.client.post("/api/articles/{}/report/".format(self.slug), self.report_data, **self.headers)
         self.assertEqual(response.status_code, 201)
 
+    # def test_if_report_data_is_returned(self):
+        
+    #     response = self.client.post("/api/articles/{}/report/".format(self.slug), self.report_data3, **self.headers)
+    #     self.assertIsInstance('report', response.data)
+
     def test_if_blank_report_is_refused(self):
 
         response = self.client.post("/api/articles/{}/report/".format(self.slug), self.report_data2, **self.headers)

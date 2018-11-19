@@ -14,11 +14,3 @@ class Follow(models.Model):
 
     def __str__(self):
         return str(self.follows)
-
-
-# def profile_was_created(sender, instance, created, ** kwargs):
-#     """ Listens for when a profile is created"""
-#     created and Follow.objects.create(username=instance)
-
-
-# post_save.connect(profile_was_created, sender=Profile)

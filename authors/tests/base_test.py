@@ -190,9 +190,9 @@ class BaseTest(TestCase):
         return self.client.post(f"/api/articles/{self.slug}/comments",
         self.comment_data, **self.headers)
 
-    def get_a_comment(self):
-        return self.client.get(f"/api/articles/{self.slug}/comments", 
-        self.comment_data, **self.headers)
+    # def get_a_comment(self):
+    #     return self.client.get(f"/api/articles/{self.slug}/comments", 
+    #     self.comment_data, **self.headers)
 
     def delete_comment(self):
         return self.client.delete(f"/api/articles/{self.slug}/comments/{self.comment_pk}",
