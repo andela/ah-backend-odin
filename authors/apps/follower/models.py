@@ -12,5 +12,5 @@ class Follow(models.Model):
     follows = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followed_people') # followee
     follow_time = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return str(self.follows)
+    # def __str__(self):
+    #     return str(self.follows)

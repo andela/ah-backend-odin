@@ -50,6 +50,19 @@ schema_view = get_schema_view(
     permission_classes=(AllowAny,),
 )
 
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Author's Haven",
+        default_version='v1',
+        description="A Social platform for the creative at heart",
+        terms_of_service="https://authors-haven-odin.herokuapp.com",
+        contact=openapi.Contact(email="odin@gmail.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(AllowAny,),
+)
+
 
 
 app_name = "authentication"	

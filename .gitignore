@@ -10,6 +10,7 @@ migrations/
 
 # Distribution / packaging
 .Python
+.vscode
 env/
 build/
 develop-eggs/

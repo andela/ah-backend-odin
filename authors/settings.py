@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'rest_framework',
-
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
@@ -46,7 +45,8 @@ INSTALLED_APPS = [
     'taggit_serializer',
     'authors.apps.reporter',
     'drf_yasg',
-    'authors.apps.follower'
+    'authors.apps.follower',
+    'django_nose',
 ]
 
 SWAGGER_SETTINGS = {
@@ -62,7 +62,7 @@ SWAGGER_SETTINGS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -70,25 +70,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 ROOT_URLCONF = 'authors.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+
 
 WSGI_APPLICATION = 'authors.wsgi.application'
 
@@ -108,6 +96,16 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'dfih7qse7emgdp',
+#         'USER': 'podujiopgnrgup',
+#         'PASSWORD': '7ab4152f4dc0b634c49b7054c2514974bd28b46848882a448d96a9658ba8fdff',
+#         'HOST': 'ec2-184-73-222-192.compute-1.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
 
 # Local Postgres Database Config
 # DATABASES = {
@@ -201,10 +199,16 @@ JWT = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
-EMAIL_HOST = os.environ.get('EMAIL_HOST')
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_PORT = os.environ.get('EMAIL_PORT')
+# EMAIL_HOST = os.environ.get('EMAIL_HOST')
+# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+# EMAIL_PORT = os.environ.get('EMAIL_PORT')
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = "authorshaventia@gmail.com"
+EMAIL_HOST_PASSWORD = "tia0987654321"
+EMAIL_PORT = 587
+
 
 BASE_URL = 'http://127.0.0.1:8000'
 

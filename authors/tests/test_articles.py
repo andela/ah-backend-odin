@@ -52,6 +52,7 @@ class ArticleLikeTests(BaseTest):
     def test_double_like_article(self):
         response = self.double_like_article()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
 class TestRating(BaseTest):
 
     def test_post_user_cannot_rate_his_own_article(self):

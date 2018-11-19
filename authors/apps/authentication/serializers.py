@@ -26,7 +26,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
         fields = ['email', 'username', 'password', 'token']
-
     def validate_email(self, value):
         user_email_db = User.objects.filter(email=value)
         if user_email_db.exists():
@@ -190,3 +189,8 @@ class UserWithProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'username', 'profile')
+
+class SocialAuthenticationSerializer(serializers.Serializer):
+    """Serializers social_auth requests"""
+    access_token = serializers.CharField(max_length=2000, required=True, trim_whitespace=True)
+    
