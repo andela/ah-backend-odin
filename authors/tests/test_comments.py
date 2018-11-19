@@ -4,7 +4,7 @@ from rest_framework.utils.serializer_helpers import ReturnList, ReturnDict
 from .base_test import BaseTest
 
 
-class ArticlesTest(BaseTest):
+class CommentTest(BaseTest):
 
     def test_create_comment(self):
         """Test user can create a comment"""
@@ -31,3 +31,17 @@ class ArticlesTest(BaseTest):
         self.create_comment()
         response = self.create_thread()
         self.assertEqual(response.status_code, 201)
+
+class CommentLikeTests(BaseTest):
+
+    def test_like_comment(self):
+        response = self.like_comment()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_dislike_comment(self):
+        response = self.dislike_comment()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_double_like_comment(self):
+        response = self.double_like_comment()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)

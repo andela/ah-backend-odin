@@ -1,14 +1,12 @@
 from rest_framework import serializers
-from .models import (Article, 
-                    FavoriteArticle, 
-                    Rating)
 from ..authentication.models import User
 from .models import (Article, 
                     ArticleLikes, 
                     Thread, 
                     Comment,
                     FavoriteArticle, 
-                    Rating)
+                    Rating,
+                    LikeComment)
 from rest_framework.validators import UniqueTogetherValidator
 from ..authentication.serializers import UserSerializer
 from taggit_serializer.serializers import (TagListSerializerField,
@@ -235,7 +233,7 @@ class CreateCommentAPIViewSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     class Meta:
         model = Comment
-        fields = ('id','body','article','createdAt','updatedAt','author', )
+        fields = ('id','body','article','createdAt','updatedAt','author', 'commentlikescount', 'commentdislikescount')
         read_only_fields = ('article', )
 
     def validate(self, data):
@@ -280,3 +278,29 @@ class CreateThreadAPIViewSerializer(serializers.ModelSerializer):
         comment = self.context["comment"]
         body = validated_data.get('body')        
         return Thread.objects.create(body=body, author=author, comment=comment)
+
+
+class CommentLikeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LikeComment
+        fields = ['author', 'comment', 'like_status']
+
+    def create(self, validated_data):
+        try:
+            self.instance = LikeComment.objects.filter(author=validated_data["author"],
+                                        comment=validated_data["comment"])[0:1].get()
+        except LikeComment.DoesNotExist:
+            return LikeComment.objects.create(**validated_data)
+
+        self.perform_update(validated_data)
+        return self.instance
+
+    def perform_update(self, validated_data):
+
+        if self.instance.like_status == validated_data["like_status"]:
+            self.instance.delete()
+        else:
+            self.instance.like_status = validated_data["like_status"]
+            self.instance.save()
+

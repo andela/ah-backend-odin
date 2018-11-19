@@ -27,7 +27,8 @@ from .models import (Article,
                     Thread,
                     Rating,
                     FavoriteArticle,
-                    BookmarkingArticles)
+                    BookmarkingArticles,
+                    LikeComment)
 from .serializers import (ArticleDetailSerializer,
                         CreateArticleAPIViewSerializer,
                         CreateCommentAPIViewSerializer,
@@ -35,7 +36,8 @@ from .serializers import (ArticleDetailSerializer,
                         UpdateArticleAPIVIEWSerializer,
                         LikeArticleAPIViewSerializer,
                         FavoriteArticlesSerializer,
-                        RatingsSerializer)                          
+                        RatingsSerializer,
+                        CommentLikeSerializer)                          
 from rest_framework.exceptions import (PermissionDenied, 
                                         ValidationError, 
                                         APIException)
@@ -512,7 +514,7 @@ class RetrieveArticlesWithFavoritesStatus(generics.RetrieveAPIView):
 
 
         return Response({"Articles": article_object}, status=status.HTTP_200_OK)
-class ListCreateCommentsAPIView(generics.CreateAPIView):
+class ListCreateCommentsAPIView(generics.ListCreateAPIView):
     renderer_classes = (CommentJsonRenderer, )
     queryset = Comment.objects.all()
     serializer_class = CreateCommentAPIViewSerializer
@@ -583,3 +585,35 @@ class ListCreateThreadAPIView(generics.ListCreateAPIView):
         serializer.errors
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+class CommentLikeAPIView(generics.GenericAPIView):
+    serializer_class = CommentLikeSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+    lookup_field = 'pk'
+
+    def post(self, request, *args, **kwargs):
+        """This method allows user to like and dislike a comment"""
+
+        like_details = request.data.get('comment', {})
+        like_details['comment'] = int(kwargs['pk'])
+        
+        try: 
+            Comment.objects.get(id=like_details['comment'])
+        except:
+            raise APIException({
+                'Error': "Comment doesn't exist in the database"
+            })
+
+        author_id = User.objects.get(email = request.user)
+        like_details['author'] = author_id.id
+        serializer = self.serializer_class(data=like_details)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+
+

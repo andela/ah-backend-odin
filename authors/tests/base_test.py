@@ -105,17 +105,31 @@ class BaseTest(TestCase):
             "favorite_status": "True"
         }
   
-        self.report_data2 = {"report" : 
-                                {
-                                    "reason" : ""
-                                }
-                            }
+        self.report_data2 = {
+            "report" : {
+                "reason" : ""
+            }
+        }
 
-        self.report_data3 = {"object" : 
-                                {
-                                    "reason" : "this is a plagized article"
-                                }
-                            }
+        self.report_data3 = {
+            "object" : {
+                "reason" : "this is a plagized article"
+            }
+        }
+
+
+        self.like_comment_data = {
+            "comment": {
+                "like_status":"like"
+            }
+        }
+
+
+        self.dislike_comment_data = {
+            "comment": {
+                "like_status":"dislike"
+            }
+        }                            
         
         self.token = dict(self.login_user().data)['token']
         self.headers = {'HTTP_AUTHORIZATION': f'Bearer {self.token}'}
@@ -151,6 +165,7 @@ class BaseTest(TestCase):
     def bookmark_article(self):
         return self.client.post(f"/api/articles/{self.slug}/bookmark", **self.headers)
         
+
     def like_article(self):
         return self.client.post(f"/api/articles/{self.slug}/likes", self.article_like_data, **self.headers)
     
@@ -217,3 +232,11 @@ class BaseTest(TestCase):
         return self.client.post(f"/api/articles/{self.wrong_slug}/comments", 
         self.comment_data, **self.headers)  
 
+    def like_comment(self):
+        return self.client.post(f"/api/articles/{self.comment_pk}/comments/like", self.like_comment_data, **self.headers)
+    
+    def dislike_comment(self):
+        return self.client.post(f"/api/articles/{self.comment_pk}/comments/like", self.dislike_comment_data, **self.headers)
+    
+    def double_like_comment(self):
+        return self.client.post(f"/api/articles/{self.comment_pk}/comments/like", self.dislike_comment_data, **self.headers)

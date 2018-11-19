@@ -11,7 +11,8 @@ from .views import (
     RetrieveArticlesWithFavoritesStatus,
     ListCreateCommentsAPIView,
     CommentRetrieveDestroyAPIView,
-    ListCreateThreadAPIView
+    ListCreateThreadAPIView,
+    CommentLikeAPIView
 )
 
 urlpatterns = [
@@ -30,5 +31,8 @@ urlpatterns = [
     path('<str:slug>/comments/<int:pk>', 
         CommentRetrieveDestroyAPIView.as_view()),
     path('<str:slug>/comments/<int:pk>/threads',
-        ListCreateThreadAPIView.as_view()),        
+        ListCreateThreadAPIView.as_view()), 
+    path('<int:pk>/comments/like',
+        CommentLikeAPIView.as_view()), 
+
 ]
