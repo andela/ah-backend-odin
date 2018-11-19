@@ -143,9 +143,6 @@ class FavoriteArticlesSerializer(serializers.ModelSerializer):
         model = FavoriteArticle
 
         fields = ('article', 'favorite_status', 'author', 'favorited_at', 'last_updated_at')
-        
-        
-        
 
 
 class CreateCommentAPIViewSerializer(serializers.ModelSerializer):
