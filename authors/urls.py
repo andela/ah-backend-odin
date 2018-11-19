@@ -20,10 +20,34 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
 
-from authors.apps.authentication.views import(
-    password_reset,
-    reset_password,
-    change_passowrd
+from authors.apps.authentication.views import (change_passowrd, password_reset,
+                                               reset_password)
+
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Author's Haven",
+        default_version='v1',
+        description="A Social platform for the creative at heart",
+        terms_of_service="https://authors-haven-odin.herokuapp.com",
+        contact=openapi.Contact(email="odin@gmail.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(AllowAny,),
+)
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Author's Haven",
+        default_version='v1',
+        description="A Social platform for the creative at heart",
+        terms_of_service="https://authors-haven-odin.herokuapp.com",
+        contact=openapi.Contact(email="odin@gmail.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(AllowAny,),
 )
 
 schema_view = get_schema_view(
@@ -53,6 +77,7 @@ urlpatterns = [
     re_path(r'^api/password_reset/', password_reset, name='password'),
     re_path(r'^api/reset_password/', reset_password, name='reset_password'),
     path('api/articles/', include('authors.apps.articles.urls')),
+    path('api/profiles/', include('authors.apps.follower.urls')),
     path('api/articles/', include('authors.apps.reporter.urls')),
     re_path(
         r'^api-auth/',

@@ -18,6 +18,10 @@ class Profile(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+
+    def __str__(self):
+        return self.username
 
 
 def user_was_created(sender, instance, created, ** kwargs):

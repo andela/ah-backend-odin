@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'authors.apps.core',
     'authors.apps.profiles',
     'authors.apps.reporter',
+    'authors.apps.follower',
 ]
 
 MIDDLEWARE = [

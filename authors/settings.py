@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'taggit_serializer',
     'authors.apps.reporter',
     'drf_yasg',
+    'authors.apps.follower',
+    'django_nose',
 ]
 
 SWAGGER_SETTINGS = {
@@ -151,7 +153,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Kampala'
 
 USE_I18N = True
 

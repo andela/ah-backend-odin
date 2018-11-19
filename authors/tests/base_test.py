@@ -127,15 +127,10 @@ class BaseTest(TestCase):
 
     def create_user(self):
         return self.client.post("/api/users/", self.user_data)
-
       
     def login_user(self):
         self.create_user()
         return self.client.post("/api/users/login/", self.user_data)
-    
-    def login_user2(self):
-        self.create_user()
-        return self.client.post("/api/users/login/", self.user_data2)
 
     def create_article(self):
         self.create_user()
@@ -155,6 +150,7 @@ class BaseTest(TestCase):
     
     def bookmark_article(self):
         return self.client.post(f"/api/articles/{self.slug}/bookmark", **self.headers)
+        
     def like_article(self):
         return self.client.post(f"/api/articles/{self.slug}/likes", self.article_like_data, **self.headers)
     
@@ -205,9 +201,9 @@ class BaseTest(TestCase):
         return self.client.post(f"/api/articles/{self.slug}/comments",
         self.comment_data, **self.headers)
 
-    def get_a_comment(self):
-        return self.client.get(f"/api/articles/{self.slug}/comments", 
-        self.comment_data, **self.headers)
+    # def get_a_comment(self):
+    #     return self.client.get(f"/api/articles/{self.slug}/comments", 
+    #     self.comment_data, **self.headers)
 
     def delete_comment(self):
         return self.client.delete(f"/api/articles/{self.slug}/comments/{self.comment_pk}",

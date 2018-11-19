@@ -88,6 +88,92 @@ class UpdateArticleAPIVIEWSerializer(serializers.ModelSerializer):
         article_instance.save()
         return article_instance 
 
+
+class LikeArticleAPIViewSerializer(serializers.ModelSerializer):
+
+
+    action_performed = "created"
+
+    class Meta:
+        model = ArticleLikes
+        fields = ['author', 'article', 'article_like']
+
+    def create(self, validated_data):
+
+        try:
+            self.instance = ArticleLikes.objects.filter(author=validated_data["author"].id)[
+                            0:1].get()
+        except ArticleLikes.DoesNotExist:
+            return ArticleLikes.objects.create(**validated_data)
+
+        self.perform_update(validated_data)
+        return self.instance
+
+    def perform_update(self, validated_data):
+        if self.instance.article_like == validated_data["article_like"]:
+            self.instance.delete()
+            self.action_performed = "deleted"
+        else:
+            self.instance.article_like = validated_data["article_like"]
+            self.instance.save()
+            self.action_performed = "updated"
+
+class FavoriteArticlesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = FavoriteArticle
+
+        fields = ('article', 'favorite_status', 'author', 'favorited_at', 'last_updated_at')
+        
+        
+        
+
+
+class CreateCommentAPIViewSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
+    class Meta:
+        model = Comment
+        fields = ('id','body','article','createdAt','updatedAt','author', )
+        read_only_fields = ('article', )
+
+    def validate(self, data):
+        comment = data.get('body', None)
+        if len(comment) < 2:
+            raise serializers.ValidationError(
+                "Comment should have atlest 2 characters"
+            )
+        else:
+            return {
+            'body': comment,
+            }
+        
+
+    def create(self, validated_data):  
+        author = self.context["author"]
+        article = self.context["article"]
+        body = validated_data.get('body')        
+        return Comment.objects.create(body=body, author=author, article=article)
+
+
+
+class CreateThreadAPIViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Thread
+        fields = ('id','body','author','comment','createdAt','updatedAt')
+        read_only_fields = ('author', 'comment', )
+
+    def validate(self, data):
+        comment_thread = data.get('body', None)
+        if len(comment_thread) < 2:
+            raise serializers.ValidationError(
+                "Comment should have atlest 2 characters"
+            )
+        else:
+            return {
+            'body': comment_thread,
+            }
+
 class RatingsSerializer(serializers.ModelSerializer):
     
     class Meta:
