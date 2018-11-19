@@ -64,6 +64,7 @@ class Rating(models.Model):
     updated_at = models.DateField(auto_now=True)
 
 
+
 class FavoriteArticle(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     favorite_status = models.BooleanField(default=False)
@@ -78,6 +79,14 @@ class Comment(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
+    @property
+    def commentlikescount(self):
+        return LikeComment.objects.filter(like_status="like",comment=self).count()
+        
+    @property
+    def commentdislikescount(self):
+        return LikeComment.objects.filter(like_status="dislike",comment=self).count()
+
 class Thread(models.Model):
     body = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -85,3 +94,13 @@ class Thread(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
+class LikeComment(models.Model):
+    like = 'like'
+    dislike = 'dislike'
+    choices = ((like, 'like'), (dislike, 'dislike'))
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    like_status = models.CharField(max_length=9, choices=choices)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)   
+    pass
