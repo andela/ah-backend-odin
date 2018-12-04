@@ -117,13 +117,3 @@ class TestResetPassword(BaseTest):
         response = self.create_token_and_send_reset_link()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_implement_password_change(self):
-        self.create_user()
-        self.create_token_and_send_reset_link()
-
-        response = self.reset_password()
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-
