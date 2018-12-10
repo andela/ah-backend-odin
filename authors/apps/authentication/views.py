@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from .models import User
 from rest_framework.generics import (RetrieveUpdateAPIView,
-                                    ListAPIView, 
-                                    CreateAPIView)
+                                     ListAPIView,
+                                     CreateAPIView)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -39,11 +39,15 @@ from django.utils.http import urlsafe_base64_decode
 from rest_framework.decorators import api_view
 
 from django.shortcuts import get_object_or_404
-from authors.apps.PasswordResetToken.models import Token
+from authors.apps.password_reset_token.models import Token
 
 from django.utils.timezone import now
 
 import uuid
+from authors.settings import PASSWORD_RESET_LINK
+
+
+from django.http import HttpResponseRedirect
 
 
 class RegistrationAPIView(generics.CreateAPIView):
@@ -55,7 +59,7 @@ class RegistrationAPIView(generics.CreateAPIView):
     def post(self, request):
         user = request.data.get('user', {})
 
-        #The create serializer, validate serializer, save serializer pattern
+        # The create serializer, validate serializer, save serializer pattern
         # below is common and you will see it a lot throughout this course and
         # your own work later on. Get familiar with it.
         serializer = self.serializer_class(data=user)
@@ -135,82 +139,98 @@ class UserRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
 @api_view(['GET', 'POST'])
 def password_reset(request):
     if request.method == 'POST':
-
+        data = {}
         token = uuid.uuid4()
+
         email = request.data.get('email')
 
-        user = get_object_or_404(User, email=email)
+        user = User.objects.get(email=email)
+        if user:
 
-        Token.objects.create(
-            token=token,
-            email=user.email
-        )
+            Token.objects.create(
+                token=token,
+                email=user.email
+            )
 
-        url = f'http://127.0.0.1:8000/api/reset_password/?token={token}'
+            url = PASSWORD_RESET_LINK.format(token)
 
-        message = f'Please click the link to reset your password\n {url} \n {token}'
+            message = f'Please click the link to reset your password\n {url} \n {token}'
 
-        send_mail(
-            'Password Reset Link',
-            message,
-            settings.EMAIL_HOST_USER,
-            [user.email],
-            fail_silently=False,
-        )
+            send_mail(
+                'Password Reset Link',
+                message,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                fail_silently=False,
+            )
+            data['status'] = 1
+            data['message'] = "An email has been sent to you, please follow the link in the email to reset your password"
 
-        return Response({"message": "email sent", "data": request.data})
-
-
-@api_view(['GET'])
-def reset_password(request):
-    token = request.POST.get('token')
-
-    token = get_object_or_404(Token, token=token)
-
-    time_created = token.created_at
-    current_time = now()
-    diff = current_time - time_created
-    hours = round(diff.total_seconds() / 3600)
-
-    data = {
-        'token_status': False
-    }
-
-    if token:
-        data['token_status'] = True
-        if hours > 4:
-            return Response({'message': 'Password reset token only valid for 4 hours, please re-try to reset your password', "data": data})
-
-        return Response({"message": "Token Exists And It's Valid, allow password reset", "data": data})
-    else:
-        return Response({"message": "Token  does not Exist, password reset request denied", "data": data})
+        else:
+            data['status'] = 0
+            data['message'] = "This email is not registered by Authors Haven yet, please sign up instead"
+    return Response(data=data)
 
 
 @api_view(['POST'])
 def change_passowrd(request):
     if request.method == 'POST':
-        data = {}
 
-        email = request.data.get('email')
-        
+        data = {}
+        print(request.data)
+        token = request.data.get('token')
+
+        token_object = Token.objects.get(token=token)
+
+        email = token_object.email
+
         user = User.objects.get(email=email)
 
-        if user:
-            password = request.data.get('password')
+        time_created = token_object.created_at
 
+        current_time = now()
 
-            if validate_password(password) == True:
-                user.set_password(password)
-                user.save()
-                data['message'] = 'Password Successfully Updated!'
+        diff = current_time - time_created
+
+        hours = round(diff.total_seconds() / 3600)
+
+        data = {
+            'token_status': False
+        }
+
+        if token_object:
+
+            data['token_status'] = True
+
+            if hours > 4:
+
+                data['message'] = 'Password reset token only valid for 4 hours, please re-try to reset your password'
+
             else:
-                data['message'] = 'Password Does Not Meet All Requirements(Must Be At Least 8 Characters, Mixed Capital,Symbols and Lower Cases'
+
+                password = request.data.get('password')
+
+                if validate_password(password) == True:
+
+                    user.set_password(password)
+
+                    user.save()
+
+                    data['message'] = 'Password Successfully Updated!'
+
+                else:
+
+                    data['message'] = 'Password Does Not Meet All Requirements(Must Be At Least 8 Characters, Mixed Capital,Symbols and Lower Cases)'
+
         else:
-            data['message'] = f"User with email address {email} does not exist"
-        return Response(data=data)
+
+            data["message"] = "Token  does not Exist, password reset request denied"
+
+    return Response(data=data)
 
 
 def validate_password(password):
+
     return bool(re.match(r"[A-Za-z0-9@#$%^&+=]{8,}", password))
 
 
@@ -227,38 +247,38 @@ class FacebookAPIView(CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = SocialAuthenticationSerializer
     renderer_classes = (UserJSONRenderer,)
+
     def create(self, request, *args, **kwargs):
-        
+
         serializer = self.serializer_class(data=request.data['user'])
-        
+
         serializer.is_valid(raise_exception=True)
         access_token = serializer.data.get('access_token')
-        
+
         try:
-            #we obtain details of the user from the access token
+            # we obtain details of the user from the access token
             graph = facebook.GraphAPI(access_token=access_token)
             user_info = graph.get_object(
                 id='me',
-                fields='first_name, middle_name, last_name, id, email') 
+                fields='first_name, middle_name, last_name, id, email')
         except facebook.GraphAPIError as e:
             return Response({"error": e.message}, status=status.HTTP_400_BAD_REQUEST)
-        
 
         try:
-            #we just authenticate the user if there email exits in the database
+            # we just authenticate the user if there email exits in the database
             user = User.objects.get(email=user_info.get('email'))
             return Response({
                 'email': user.email,
                 'username': user.username,
                 'token': user.token
-            }, status=status.HTTP_200_OK) 
+            }, status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            #we create the user if there email doesn't exist in the database
+            # we create the user if there email doesn't exist in the database
             password = User.objects.make_random_password()
             user = User(
-                username = user_info.get('first_name'),
-                email = user_info.get('email'),
-                is_active = 1,
+                username=user_info.get('first_name'),
+                email=user_info.get('email'),
+                is_active=1,
             )
             user.set_password(password)
             user.save()
@@ -266,9 +286,7 @@ class FacebookAPIView(CreateAPIView):
                 'email': user.email,
                 'username': user.username,
                 'token': user.token
-            }, status=status.HTTP_200_OK)                      
-
-
+            }, status=status.HTTP_200_OK)
 
 
 class GoogleAPIView(CreateAPIView):
@@ -278,31 +296,32 @@ class GoogleAPIView(CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = SocialAuthenticationSerializer
     renderer_classes = (UserJSONRenderer,)
+
     def create(self, request, *args, **kwargs):
 
-        access_token=request.data.get('user').get('access_token')
+        access_token = request.data.get('user').get('access_token')
         try:
-            results = urllib.request.urlopen(f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}").read()
+            results = urllib.request.urlopen(
+                f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}").read()
             user_details = json.loads(results.decode())
         except:
             return Response({"Error": "Wrong Token Supplied"}, status=status.HTTP_400_BAD_REQUEST)
 
-
         try:
-            #we just authenticate the user if there email exits in the database
+            # we just authenticate the user if there email exits in the database
             user = User.objects.get(email=user_details.get('email'))
             return Response({
                 'email': user.email,
                 'username': user.username,
                 'token': user.token
-            }, status=status.HTTP_200_OK) 
+            }, status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            #we create the user if there email doesn't exist in the database
+            # we create the user if there email doesn't exist in the database
             password = User.objects.make_random_password()
             user = User(
-                username = user_details.get('name'),
-                email = user_details.get('email'),
-                is_active = 1
+                username=user_details.get('name'),
+                email=user_details.get('email'),
+                is_active=1
             )
             user.set_password(password)
             user.save()
@@ -310,6 +329,4 @@ class GoogleAPIView(CreateAPIView):
                 'email': user.email,
                 'username': user.username,
                 'token': user.token
-            }, status=status.HTTP_200_OK)          
-
-
+            }, status=status.HTTP_200_OK)
