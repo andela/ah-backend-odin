@@ -79,9 +79,6 @@ class ActivationAPIView(generics.CreateAPIView):
         except(TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
 
-        if user.is_active == True:
-            return Response({'message': 'Activation link has already been used and has expired!'}, status=status.HTTP_403_FORBIDDEN)
-
         if user is not None and default_token_generator.check_token(user, token):
             user.is_active = True
             user.save()
@@ -144,9 +141,8 @@ def password_reset(request):
 
         email = request.data.get('email')
 
-        user = User.objects.get(email=email)
-        if user:
-
+        try:
+            user = User.objects.get(email=email)
             Token.objects.create(
                 token=token,
                 email=user.email
@@ -166,7 +162,7 @@ def password_reset(request):
             data['status'] = 1
             data['message'] = "An email has been sent to you, please follow the link in the email to reset your password"
 
-        else:
+        except User.DoesNotExist:
             data['status'] = 0
             data['message'] = "This email is not registered by Authors Haven yet, please sign up instead"
     return Response(data=data)
@@ -177,7 +173,7 @@ def change_passowrd(request):
     if request.method == 'POST':
 
         data = {}
-        print(request.data)
+
         token = request.data.get('token')
 
         token_object = Token.objects.get(token=token)
