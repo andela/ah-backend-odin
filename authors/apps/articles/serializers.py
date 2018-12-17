@@ -37,6 +37,7 @@ class CreateArticleAPIViewSerializer(TaggitSerializer,serializers.ModelSerialize
             )
         return value
     def validate_description(self, value):
+
         if len(value) > 200:
             raise serializers.ValidationError(
                 'The article should not be more than 200 characters'
@@ -98,10 +99,10 @@ class LikeArticleAPIViewSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
-        try:
+        try: # pragma: no cover
             self.instance = ArticleLikes.objects.filter(author=validated_data["author"].id)[
                             0:1].get()
-        except ArticleLikes.DoesNotExist:
+        except ArticleLikes.DoesNotExist: # pragma: no cover
             return ArticleLikes.objects.create(**validated_data)
 
         self.perform_update(validated_data)

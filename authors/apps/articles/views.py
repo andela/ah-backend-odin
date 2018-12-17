@@ -14,7 +14,6 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from .filters import FilterArticles
 from django.contrib import auth
-from .pagination import ArticleLimitOffSetPagination
 from ..authentication.backends import JWTAuthentication
 from ..authentication.models import User
 from authors.settings import SECRET_KEY
@@ -54,7 +53,6 @@ class ListCreateArticleAPIView(generics.ListCreateAPIView):
     renderer_classes = (ArticleJSONRenderer, )
     serializer_class = CreateArticleAPIViewSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = ArticleLimitOffSetPagination
 
     def get_queryset(self):
         return FilterArticles.by_request(self.request)

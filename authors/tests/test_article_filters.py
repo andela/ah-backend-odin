@@ -14,14 +14,14 @@ class TestArticleFilters(BaseAPITestCase):
         response = self.client.get(
             "/api/articles/?title=Some article with another title"
         )
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
     def test_it_filters_articles_by_article_tag(self):
         self.create_article()
         self.create_article(tagList=['learning', 'django'])
         self.create_article(tagList=['learning', 'vuejs', "aws", "jest"])
         response = self.client.get("/api/articles/?tag=learning")
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data['results']), 2)
 
     def test_it_filters_articles_by_article_description(self):
         description = "Testing django apps"
@@ -29,17 +29,17 @@ class TestArticleFilters(BaseAPITestCase):
         response = self.client.get(
             f"/api/articles/?description={description}"
         )
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
     def test_it_filters_articles_by_author_username(self):
         self.create_articles_with_diferent_authors()
         response = self.client.get("/api/articles/?author=krm")
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
     def test_it_filters_articles_by_author_email(self):
         self.create_articles_with_diferent_authors()
         response = self.client.get("/api/articles/?author=krm@example.com")
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
     def create_articles_with_diferent_authors(self):
         self.create_article()
