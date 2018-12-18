@@ -7,8 +7,7 @@ class Profile(models.Model):
 
     username = models.CharField(max_length=255, primary_key=True)
     bio = models.TextField(null=True, blank=True)
-    image = models.ImageField(
-        upload_to="avatars",
+    image = models.URLField(
         null=True,
         blank=True
     )
