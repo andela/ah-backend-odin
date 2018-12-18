@@ -538,7 +538,7 @@ class ListCreateCommentsAPIView(generics.ListCreateAPIView):
 class CommentRetrieveDestroyAPIView(generics.RetrieveDestroyAPIView):  
     renderer_classes = (CommentJsonRenderer, )
     queryset = Comment.objects.all()
-    serializer_class = CreateThreadAPIViewSerializer
+    serializer_class = CreateCommentAPIViewSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def delete(self, request, *args, **kwargs):

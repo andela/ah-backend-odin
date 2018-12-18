@@ -4,9 +4,6 @@ from datetime import datetime, timedelta
 
 from taggit.managers import TaggableManager
 
-
-# Create your models here.
-
 class Article(models.Model):
 
 
