@@ -25,10 +25,10 @@ class UserManager(BaseUserManager):
   def create_user(self, username, email, password=None):
     """Create and return a `User` with an email, username and password."""
     if username is None:
-      raise TypeError('Users must have a username.')
+      raise TypeError('Users must have a username.') # pragma: no cover
 
     if email is None:
-      raise TypeError('Users must have an email address.')
+      raise TypeError('Users must have an email address.') # pragma: no cover
 
     user = self.model(username=username, email=self.normalize_email(email))
     user.set_password(password)
@@ -56,15 +56,15 @@ class UserManager(BaseUserManager):
     Superuser powers means that this use is an admin that can do anything
     they want.
     """
-    if password is None:
-      raise TypeError('Superusers must have a password.')
+    if password is None: # pragma: no cover
+      raise TypeError('Superusers must have a password.') # pragma: no cover
 
-    user = self.create_user(username, email, password)
-    user.is_superuser = True
-    user.is_staff = True
-    user.save()
+    user = self.create_user(username, email, password) # pragma: no cover
+    user.is_superuser = True # pragma: no cover
+    user.is_staff = True # pragma: no cover
+    user.save() # pragma: no cover
 
-    return user
+    return user # pragma: no cover
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -123,7 +123,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     Typically, this would be the user's first and last name. Since we do
     not store the user's real name, we return their username instead.
     """
-    return self.username
+    return self.username  # pragma: no cover
 
   def get_short_name(self):
     """
@@ -131,7 +131,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     Typically, this would be the user's first name. Since we do not store
     the user's real name, we return their username instead.
     """
-    return self.username
+    return self.username # pragma: no cover
 
   @property
   def token(self):

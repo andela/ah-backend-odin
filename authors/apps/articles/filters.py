@@ -10,7 +10,7 @@ class FilterArticles:
     @classmethod
     def by_request(cls, request):
         """ Filters articles by request"""
-        return FilterArticles()._run_filters(request.GET)._results()
+        return FilterArticles()._run_filters(request.GET)._results().order_by('-updated_at')
 
     def _run_filters(self, keywords):
         """Runs all the filters available on the request class"""
