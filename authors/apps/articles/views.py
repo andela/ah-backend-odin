@@ -36,7 +36,8 @@ from .serializers import (ArticleDetailSerializer,
                         LikeArticleAPIViewSerializer,
                         FavoriteArticlesSerializer,
                         RatingsSerializer,
-                        CommentLikeSerializer)                          
+                        CommentLikeSerializer,
+                        BookmarkSerializer,)                          
 from rest_framework.exceptions import (PermissionDenied, 
                                         ValidationError, 
                                         APIException)
@@ -44,7 +45,8 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from .renderers import (ArticleJSONRenderer,
                         CommentJsonRenderer,
-                        ThreadJsonRenderer)
+                        ThreadJsonRenderer,
+                        BookMarkJSONRenderer,)
 
 
 
@@ -169,7 +171,6 @@ class UpdateDestroyArticleAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class BookMarkArticleAPIView(generics.ListCreateAPIView):
-
     renderer_classes = (ArticleJSONRenderer, )
     queryset = Article.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -196,6 +197,19 @@ class BookMarkArticleAPIView(generics.ListCreateAPIView):
             }),
             content_type="application/json"
         )
+
+
+class ViewUserBookmarks(generics.ListAPIView):
+    serializer_class = BookmarkSerializer
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (BookMarkJSONRenderer,)
+    queryset = BookmarkingArticles.objects.all()
+    
+    def list(self, request):
+        user = request.user
+        queryset=self.get_queryset().filter(user_id=user.id)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
 
 
 class LikeArticleAPIView(generics.ListCreateAPIView):

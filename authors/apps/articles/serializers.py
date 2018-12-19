@@ -6,7 +6,8 @@ from .models import (Article,
                     Comment,
                     FavoriteArticle, 
                     Rating,
-                    LikeComment)
+                    LikeComment,
+                    BookmarkingArticles,)
 from rest_framework.validators import UniqueTogetherValidator
 from ..authentication.serializers import UserSerializer
 from taggit_serializer.serializers import (TagListSerializerField,
@@ -236,3 +237,10 @@ class CommentLikeSerializer(serializers.ModelSerializer):
             self.instance.like_status = validated_data["like_status"]
             self.instance.save()
 
+class BookmarkSerializer(serializers.ModelSerializer):
+
+    user = serializers.ReadOnlyField(source="user.username")
+    article_id = serializers.ReadOnlyField(source="article_id.title")
+    class Meta:
+        model = BookmarkingArticles
+        fields = ['user', 'article_id', 'bookmarked_at']
