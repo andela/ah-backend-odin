@@ -31,8 +31,8 @@ class ArticlesTest(BaseTest):
         response = self.update_article()
         self.assertEqual(response.status_code, 201)
 
-class BookMarkTest(BaseTest):
 
+class BookMarkTest(BaseTest):
 
     def test_bookmark_article(self):
         response = self.bookmark_article()
@@ -53,6 +53,7 @@ class ArticleLikeTests(BaseTest):
         response = self.double_like_article()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+
 class TestRating(BaseTest):
 
     def test_post_user_cannot_rate_his_own_article(self):
@@ -62,23 +63,6 @@ class TestRating(BaseTest):
         response = self.create_rating()
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-
-    def test_get_one_article_rating(self):
-
-        self.create_article()
-
-        response = self.get_one_article_rating()
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_get_all_articles_and_their_ratings(self):
-
-        self.create_article()
-
-        response = self.get_articles_and_their_ratings()
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class TestReadingTime(BaseTest):
@@ -112,7 +96,6 @@ class TestReadingTime(BaseTest):
         response = self.get_articles_with_their_reading_time()
 
         self.assertEqual(response.status_code, 200)
-
 
     def test_get_articles_and_their_favorite_status(self):
         self.create_article_favorite()

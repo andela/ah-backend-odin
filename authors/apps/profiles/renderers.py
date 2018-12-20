@@ -1,4 +1,4 @@
-import json
+import json  # pragma : no cover
 
 from rest_framework.renderers import JSONRenderer
 

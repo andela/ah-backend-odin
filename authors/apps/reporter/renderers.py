@@ -1,4 +1,4 @@
-import json
+import json  # pragma : no cover
 
 from rest_framework.renderers import JSONRenderer
 from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
@@ -8,7 +8,6 @@ class ReporterJsonRenderer(JSONRenderer):
 
     charset = 'utf-8'
     db_object_label = 'report'
-    
 
     def render(self, data, media_type=None, render_context=None):
         if type(data) != ReturnList:
@@ -21,7 +20,7 @@ class ReporterJsonRenderer(JSONRenderer):
             return json.dumps({
                 self.db_object_label: data
             })
-    
+
         return json.dumps({
-            'report' : data
+            'report': data
         })

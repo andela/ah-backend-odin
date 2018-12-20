@@ -4,13 +4,12 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
 
 
-
 class ArticleJSONRenderer(JSONRenderer):
-    
+
     charset = 'utf-8'
     db_object_label = 'object'
-    
-    def render (self, data, media_type=None, renderer_context=None):
+
+    def render(self, data, media_type=None, renderer_context=None):
 
         if type(data) != ReturnList:
             errors = data.get('errors', None)
@@ -22,18 +21,18 @@ class ArticleJSONRenderer(JSONRenderer):
             return json.dumps({
                 self.db_object_label: data
             })
-        
+
         return json.dumps({
-            'article' : data
+            'article': data
         })
 
 
 class CommentJsonRenderer(JSONRenderer):
-    
+
     charset = 'utf-8'
     db_object_label = 'Comment'
-    
-    def render (self, data, media_type=None, renderer_context=None):
+
+    def render(self, data, media_type=None, renderer_context=None):
 
         if type(data) != ReturnList:
             errors = data.get('errors', None)
@@ -45,17 +44,18 @@ class CommentJsonRenderer(JSONRenderer):
             return json.dumps({
                 self.db_object_label: data
             })
-        
+
         return json.dumps({
-            'comment' : data
-        })  
+            'comment': data
+        })
+
 
 class ThreadJsonRenderer(JSONRenderer):
-    
+
     charset = 'utf-8'
     db_object_label = 'Comment'
-    
-    def render (self, data, media_type=None, renderer_context=None):
+
+    def render(self, data, media_type=None, renderer_context=None):
 
         if type(data) != ReturnList:
             errors = data.get('errors', None)
@@ -67,17 +67,18 @@ class ThreadJsonRenderer(JSONRenderer):
             return json.dumps({
                 self.db_object_label: data
             })
-        
+
         return json.dumps({
-            'comment' : data
-        })    
+            'comment': data
+        })
+
 
 class BookMarkJSONRenderer(JSONRenderer):
-    
+
     charset = 'utf-8'
     db_object_label = 'object'
-    
-    def render (self, data, media_type=None, renderer_context=None):
+
+    def render(self, data, media_type=None, renderer_context=None):
 
         if type(data) != ReturnList:
             errors = data.get('errors', None)
@@ -89,7 +90,7 @@ class BookMarkJSONRenderer(JSONRenderer):
             return json.dumps({
                 self.db_object_label: data
             })
-        
+
         return json.dumps({
-            'Bookmark' : data
+            'Bookmark': data
         })

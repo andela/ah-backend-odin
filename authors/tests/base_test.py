@@ -180,12 +180,6 @@ class BaseTest(TestCase):
     def create_rating(self):
         return self.client.post(f"/api/articles/{self.slug}/ratings/", self.article_rating_data, **self.headers)
 
-    def get_one_article_rating(self):
-        return self.client.get(f"/api/articles/{self.slug}/viewratings/", self.article_rating_data, **self.headers)
-
-    def get_articles_and_their_ratings(self):
-        return self.client.get(f"/api/articles/ratings/", self.article_rating_data, **self.headers)
-
     def create_token_and_send_reset_link(self):
         return self.client.post("/api/password_reset/", self.reset_token_data, **self.headers)
 
