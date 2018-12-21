@@ -24,7 +24,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         token = auth_header[1].decode("utf-8")
 
         if prefix.lower() != expected_prefix:
-            return None
+            return None # pragma: no cover
 
         return self._get_user_credentials_from_token(token)
 
@@ -32,17 +32,17 @@ class JWTAuthentication(authentication.BaseAuthentication):
         """Extracts a user from a  JSON web token"""
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
-        except Exception:
-            raise exceptions.AuthenticationFailed("Failed decoding token")
+        except Exception: # pragma: no cover
+            raise exceptions.AuthenticationFailed("Failed decoding token") # pragma: no cover
 
         try:
             user = User.objects.get(username=payload['username'])
-        except User.DoesNotExist:
-            raise exceptions.AuthenticationFailed(
+        except User.DoesNotExist:# pragma: no cover
+            raise exceptions.AuthenticationFailed( # pragma: no cover
                 "The provided token doesnot belong to any user"
             )
         if not user.is_active:
-            raise exceptions.AuthenticationFailed(
+            raise exceptions.AuthenticationFailed( # pragma: no cover
                 "The users profile has been deactivated"
             )
         # at this point we are sure we have the user

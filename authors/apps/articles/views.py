@@ -10,6 +10,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly, IsAuthenticated
 )
+from django.http import JsonResponse
 from rest_framework.response import Response
 from django.http import HttpResponse
 from .filters import FilterArticles
@@ -428,7 +429,7 @@ class ListCreateCommentsAPIView(generics.ListCreateAPIView):
     serializer_class = CreateCommentAPIViewSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
-    def create(self, request, slug):
+    def create( self, request, slug):
         """This method helps users create comments"""
         comment = request.data.get('comment', {})
         try:
@@ -442,6 +443,14 @@ class ListCreateCommentsAPIView(generics.ListCreateAPIView):
         serializer.errors
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+    def list(self, request, *args, **kwargs): 
+        """This method helps list comments"""
+        slug = kwargs['slug']
+        article= Article.objects.filter(slug=slug).first()
+        comments = Comment.objects.filter(article_id=article.id).values()
+        users_list = list(comments) 
+        return JsonResponse(users_list, safe=False)      
 
 
 class CommentRetrieveDestroyAPIView(generics.RetrieveDestroyAPIView):
