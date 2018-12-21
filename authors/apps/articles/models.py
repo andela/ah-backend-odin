@@ -6,9 +6,8 @@ from taggit.managers import TaggableManager
 
 class Article(models.Model):
 
-
-    title = models.CharField(db_index= True, max_length = 255)
-    description = models.CharField(db_index=True, max_length = 255)
+    title = models.CharField(db_index=True, max_length=255)
+    description = models.CharField(db_index=True, max_length=255)
     body = models.TextField()
     created_at = models.DateField(auto_now_add=True)
     published = models.BooleanField()
@@ -18,7 +17,9 @@ class Article(models.Model):
     slug = models.SlugField(max_length=255, unique=True)
     image = models.TextField(null=True, blank=True)
     objects = models.Manager()
-    read_time = models.TextField(max_length = 200, default="Unknown")
+    read_time = models.TextField(max_length=200, default="Unknown")
+    average_rating = models.DecimalField(
+        blank=True, default=None, null=True, max_digits=4, decimal_places=1)
 
     @property
     def likescount(self):
@@ -27,17 +28,17 @@ class Article(models.Model):
     @property
     def dislikescount(self):
         return ArticleLikes.objects.filter(article_like=False, article=self).count()
-    
+
     @property
     def comments(self):
         comments = Comment.objects.filter(article=self.id).values()
-        return [ dict(comment) for comment in comments]
-    
+        return [dict(comment) for comment in comments]
+
     objects = models.Manager()
 
 
 class BookmarkingArticles(models.Model):
- 
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article_id = models.ForeignKey(Article, on_delete=models.CASCADE)
     bookmarked_at = models.DateTimeField(auto_now_add=True)
@@ -46,13 +47,15 @@ class BookmarkingArticles(models.Model):
 
 class ArticleLikes(models.Model):
 
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, null=True, blank=True, related_name='article_likes')
+    article = models.ForeignKey(
+        Article, on_delete=models.CASCADE, null=True, blank=True, related_name='article_likes')
     article_like = models.BooleanField(db_index=True, default=None)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     article_liked_at = models.DateTimeField(auto_now_add=True)
     article_disliked_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
-    
+
+
 class Rating(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     article_rate = models.IntegerField()
@@ -61,13 +64,13 @@ class Rating(models.Model):
     updated_at = models.DateField(auto_now=True)
 
 
-
 class FavoriteArticle(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     favorite_status = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     favorited_at = models.DateTimeField(auto_now_add=True)
     last_updated_at = models.DateTimeField(auto_now=True)
+
 
 class Comment(models.Model):
     body = models.TextField()
@@ -78,11 +81,12 @@ class Comment(models.Model):
 
     @property
     def commentlikescount(self):
-        return LikeComment.objects.filter(like_status="like",comment=self).count()
-        
+        return LikeComment.objects.filter(like_status="like", comment=self).count()
+
     @property
     def commentdislikescount(self):
-        return LikeComment.objects.filter(like_status="dislike",comment=self).count()
+        return LikeComment.objects.filter(like_status="dislike", comment=self).count()
+
 
 class Thread(models.Model):
     body = models.TextField()
@@ -90,6 +94,7 @@ class Thread(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
+
 
 class LikeComment(models.Model):
     like = 'like'
@@ -99,5 +104,5 @@ class LikeComment(models.Model):
     like_status = models.CharField(max_length=9, choices=choices)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     createdAt = models.DateTimeField(auto_now_add=True)
-    updatedAt = models.DateTimeField(auto_now=True)   
+    updatedAt = models.DateTimeField(auto_now=True)
     pass

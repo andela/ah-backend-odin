@@ -213,4 +213,4 @@ BASE_URL = 'http://127.0.0.1:8000'
 TAGGIT_CASE_INSENSITIVE = True
 WPM = 200
 
-PASSWORD_RESET_LINK = 'http://localhost:3000/complete_reset?token={}'
+PASSWORD_RESET_LINK = 'https://ah-frontend-odin-staging.herokuapp.com/complete_reset?token={}'

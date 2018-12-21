@@ -21,33 +21,32 @@ from .models import FavoriteArticle
 from authors.settings import WPM
 from django.shortcuts import render
 from rest_framework import generics, status
-from .models import (Article, 
-                    Comment, 
-                    Thread,
-                    Rating,
-                    FavoriteArticle,
-                    BookmarkingArticles,
-                    LikeComment)
+from .models import (Article,
+                     Comment,
+                     Thread,
+                     Rating,
+                     FavoriteArticle,
+                     BookmarkingArticles,
+                     LikeComment)
 from .serializers import (ArticleDetailSerializer,
-                        CreateArticleAPIViewSerializer,
-                        CreateCommentAPIViewSerializer,
-                        CreateThreadAPIViewSerializer,
-                        UpdateArticleAPIVIEWSerializer,
-                        LikeArticleAPIViewSerializer,
-                        FavoriteArticlesSerializer,
-                        RatingsSerializer,
-                        CommentLikeSerializer,
-                        BookmarkSerializer,)                          
-from rest_framework.exceptions import (PermissionDenied, 
-                                        ValidationError, 
-                                        APIException)
+                          CreateArticleAPIViewSerializer,
+                          CreateCommentAPIViewSerializer,
+                          CreateThreadAPIViewSerializer,
+                          UpdateArticleAPIVIEWSerializer,
+                          LikeArticleAPIViewSerializer,
+                          FavoriteArticlesSerializer,
+                          RatingsSerializer,
+                          CommentLikeSerializer,
+                          BookmarkSerializer,)
+from rest_framework.exceptions import (PermissionDenied,
+                                       ValidationError,
+                                       APIException)
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from .renderers import (ArticleJSONRenderer,
                         CommentJsonRenderer,
                         ThreadJsonRenderer,
                         BookMarkJSONRenderer,)
-
 
 
 class ListCreateArticleAPIView(generics.ListCreateAPIView):
@@ -75,7 +74,7 @@ class ListCreateArticleAPIView(generics.ListCreateAPIView):
 
         number_of_words = len(words)
 
-        minutes = round(number_of_words/WPM,0)
+        minutes = round(number_of_words/WPM, 0)
 
         if int(minutes) < 1:
 
@@ -83,9 +82,8 @@ class ListCreateArticleAPIView(generics.ListCreateAPIView):
 
         else:
 
-            message = str(minutes)+ " Minutes"
+            message = str(minutes) + " Minutes"
 
-        
         article['read_time'] = message
 
         serializer = self.serializer_class(data=article)
@@ -119,7 +117,7 @@ class UpdateDestroyArticleAPIView(generics.RetrieveUpdateDestroyAPIView):
 
         number_of_words = len(words)
 
-        minutes = round(number_of_words/WPM,0)
+        minutes = round(number_of_words/WPM, 0)
 
         if int(minutes) < 1:
 
@@ -127,11 +125,9 @@ class UpdateDestroyArticleAPIView(generics.RetrieveUpdateDestroyAPIView):
 
         else:
 
-            message = str(minutes)+ " Minutes"
+            message = str(minutes) + " Minutes"
 
-        
         article["read_time"] = message
-
 
         token = request.META.get('HTTP_AUTHORIZATION', ' ').split(' ')[1]
         payload = jwt.decode(token, settings.SECRET_KEY, 'utf-8')
@@ -204,10 +200,10 @@ class ViewUserBookmarks(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (BookMarkJSONRenderer,)
     queryset = BookmarkingArticles.objects.all()
-    
+
     def list(self, request):
         user = request.user
-        queryset=self.get_queryset().filter(user_id=user.id)
+        queryset = self.get_queryset().filter(user_id=user.id)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
@@ -218,7 +214,6 @@ class LikeArticleAPIView(generics.ListCreateAPIView):
     serializer_class = LikeArticleAPIViewSerializer
 
     def post(self, request, slug):
-
         """This method allows user to like and dislike an article"""
 
         like = request.data.get('article', {})
@@ -228,7 +223,7 @@ class LikeArticleAPIView(generics.ListCreateAPIView):
 
         article_instance = get_object_or_404(Article, slug=slug)
         like["article"] = article_instance.pk
-        
+
         serializer = self.serializer_class(data=like)
         serializer.is_valid(raise_exception=True)
 
@@ -239,6 +234,8 @@ class LikeArticleAPIView(generics.ListCreateAPIView):
         else:
             action_status = status.HTTP_201_CREATED
         return Response(serializer.data, status=action_status)
+
+
 class CreateRatings(generics.CreateAPIView):
 
     serializer_class = RatingsSerializer
@@ -255,6 +252,8 @@ class CreateRatings(generics.CreateAPIView):
 
         article_id = article_instance.id
 
+        article_ratings = Rating.objects.filter(article=article_id)
+
         article_author = article_instance.author_id
 
         article_rate = request.data.get('article_rate')
@@ -262,7 +261,7 @@ class CreateRatings(generics.CreateAPIView):
         if not article_rate:
 
             return Response({"Message": "You must provide a rating for this article"}, status=status.HTTP_400_BAD_REQUEST)
-        if int(article_rate) >5 or int(article_rate) < 1:
+        if int(article_rate) > 5 or int(article_rate) < 1:
 
             return Response({"Message": "You must provide a rating between 1 and 5"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -273,7 +272,6 @@ class CreateRatings(generics.CreateAPIView):
         user_instance = User.objects.get(username=username)
 
         user_id = user_instance.id
-
 
         rating_body = {
 
@@ -296,131 +294,25 @@ class CreateRatings(generics.CreateAPIView):
             serializer.save()
 
             data = serializer.data
-            
+
+            total_rates = 0
+
+            ratings_count = article_ratings.count()
+
+            for each_rate in article_ratings:
+
+                total_rates = total_rates + each_rate.article_rate
+
+                if ratings_count > 0:
+
+                    average = round(total_rates/ratings_count, 1)
+
+                    Article.objects.filter(slug=slug).update(
+                        average_rating=average)
+
             data["message"] = "You Have Successfully Rated This Article"
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class RetrieveRatings(generics.RetrieveAPIView):
-
-    lookup_url_kwarg = 'slug'
-    
-    serializer_class = RatingsSerializer
-
-    def get_queryset(self, *args, **kwargs):
-
-        slug = self.kwargs.get(self.lookup_url_kwarg)
-
-        article_instance = Article.objects.get(slug=slug)
-
-        article_id = article_instance.id
-
-        article_ratings = Rating.objects.filter(article=article_id)
-        
-        return article_ratings
-
-    def retrieve(self, *args, **kwargs):
-
-        article_ratings = self.get_queryset()
-
-        body = []
-
-        article_title = {}
-
-        article_rate = {}
-
-        total_rates = 0
-
-        ratings_count = article_ratings.count()
-
-        for each_rate in article_ratings:
-
-            title = Article.objects.get(id=each_rate.article_id)
-
-            article_title['title'] = title.title
-
-            total_rates = total_rates + each_rate.article_rate
-
-        if ratings_count >0:
-
-            average = round(total_rates/ratings_count,1)
-            
-            article_rate['rating'] = average
-
-            combined_dict = {**article_title, **article_rate}
-
-            body.append(combined_dict)
-
-        return Response({"Article":body}, status=status.HTTP_200_OK)
-
-class RetrieveAllArticlesWithRatings(generics.RetrieveAPIView):
-    serializer_class = RatingsSerializer
-
-    def get_queryset(self):
-
-        article_instance = Article.objects.all()
-
-        return article_instance
-
-    def retrieve(self, *args, **kwargs):
-
-        articles = self.get_queryset()
-
-        body = []
-
-        article_title = {}
-
-        article_rate = {}
-
-        for each_article in articles:
-
-            article_id = each_article.id
-
-            article_ratings = Rating.objects.filter(article=article_id)
-
-            if article_ratings:
-
-                total_rates = 0
-
-                ratings_count = article_ratings.count()
-                
-                for each_rate in article_ratings:
-
-                    article_instance = Article.objects.get(id=article_id)
-
-                    article_title['title'] = article_instance.title
-
-                    total_rates = total_rates + each_rate.article_rate
-
-                if ratings_count >0:
-
-                    average = round(total_rates/ratings_count,1)
-                
-                    article_rate['rating'] = average
-
-                    combined_dict = {**article_title, **article_rate}
-
-                    body.append(combined_dict)
-
-            else:
-
-                article_instance = Article.objects.get(id=article_id)
-
-                article_title['title'] = article_instance.title  
-
-                average = "Unknown"
-                
-                article_rate['rating'] = average
-
-                combined_dict = {**article_title, **article_rate}
-
-                print(combined_dict)
-
-                body.append(combined_dict)
-            
-        return Response({"Article":body}, status=status.HTTP_200_OK)
-
 
 
 class FavoriteArticles(generics.ListCreateAPIView):
@@ -463,10 +355,11 @@ class FavoriteArticles(generics.ListCreateAPIView):
         serializer.save()
 
         data = serializer.data
-        
+
         data["message"] = "You Have Successfully Added This Article To Your Favorites"
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class RetrieveArticlesWithFavoritesStatus(generics.RetrieveAPIView):
 
@@ -506,11 +399,13 @@ class RetrieveArticlesWithFavoritesStatus(generics.RetrieveAPIView):
 
             body['body'] = article.body
 
-            favorite_object = FavoriteArticle.objects.filter(article_id=article.id, author=user_id).exists()
+            favorite_object = FavoriteArticle.objects.filter(
+                article_id=article.id, author=user_id).exists()
 
             if favorite_object:
-                
-                favorite_object_instance = FavoriteArticle.objects.get(article_id=article.id, author=user_id)
+
+                favorite_object_instance = FavoriteArticle.objects.get(
+                    article_id=article.id, author=user_id)
 
                 favorite_status = favorite_object_instance.favorite_status
 
@@ -524,8 +419,9 @@ class RetrieveArticlesWithFavoritesStatus(generics.RetrieveAPIView):
 
             article_object.append(combined_json)
 
-
         return Response({"Articles": article_object}, status=status.HTTP_200_OK)
+
+
 class ListCreateCommentsAPIView(generics.ListCreateAPIView):
     renderer_classes = (CommentJsonRenderer, )
     queryset = Comment.objects.all()
@@ -536,20 +432,19 @@ class ListCreateCommentsAPIView(generics.ListCreateAPIView):
         """This method helps users create comments"""
         comment = request.data.get('comment', {})
         try:
-            article = Article.objects.get(slug = slug)
+            article = Article.objects.get(slug=slug)
         except Article.DoesNotExist:
-            return Response({"Error":"Article doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Error": "Article doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
 
-        
-        serializer = self.serializer_class(data=comment, context={'article': article,'author':request.user})
+        serializer = self.serializer_class(
+            data=comment, context={'article': article, 'author': request.user})
         serializer.is_valid(raise_exception=True)
         serializer.errors
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-      
 
 
-class CommentRetrieveDestroyAPIView(generics.RetrieveDestroyAPIView):  
+class CommentRetrieveDestroyAPIView(generics.RetrieveDestroyAPIView):
     renderer_classes = (CommentJsonRenderer, )
     queryset = Comment.objects.all()
     serializer_class = CreateCommentAPIViewSerializer
@@ -577,27 +472,27 @@ class ListCreateThreadAPIView(generics.ListCreateAPIView):
     def create(self, request, slug, pk):
         """This method creates comment threads"""
         comment_thread = request.data.get('comment', {})
-        try: 
+        try:
             Article.objects.get(slug=slug)
         except:
             raise APIException({
                 'error': "Article doesn't exist in the database"
             })
 
-        try: 
+        try:
             comment = Comment.objects.get(id=pk)
         except:
             raise APIException({
                 'error': "Comment doesn't exist in the database"
             })
 
-        author = User.objects.get(email = request.user)
-        serializer = self.serializer_class(data=comment_thread, context={'comment': comment, 'author': author})
+        author = User.objects.get(email=request.user)
+        serializer = self.serializer_class(data=comment_thread, context={
+                                           'comment': comment, 'author': author})
         serializer.is_valid(raise_exception=True)
         serializer.errors
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 
 class CommentLikeAPIView(generics.GenericAPIView):
@@ -610,22 +505,17 @@ class CommentLikeAPIView(generics.GenericAPIView):
 
         like_details = request.data.get('comment', {})
         like_details['comment'] = int(kwargs['pk'])
-        
-        try: 
+
+        try:
             Comment.objects.get(id=like_details['comment'])
         except:
             raise APIException({
                 'Error': "Comment doesn't exist in the database"
             })
 
-        author_id = User.objects.get(email = request.user)
+        author_id = User.objects.get(email=request.user)
         like_details['author'] = author_id.id
         serializer = self.serializer_class(data=like_details)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-
-
-
